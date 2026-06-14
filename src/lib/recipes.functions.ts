@@ -24,7 +24,7 @@ export const getRecipeBySlug = createServerFn({ method: "GET" })
       .eq("slug", data.slug)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    return (row as Recipe | null) ?? null;
+    return ((row as unknown) as Recipe | null) ?? null;
   });
 
 const RecipeImportSchema = z.object({
