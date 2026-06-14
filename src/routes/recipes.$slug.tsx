@@ -68,7 +68,7 @@ export const Route = createFileRoute("/recipes/$slug")({
 });
 
 function RecipePage() {
-  const recipe = Route.useLoaderData();
+  const recipe = Route.useLoaderData() as import("@/lib/recipe-types").Recipe;
   const { isFav, toggle } = useFavourites();
   const { set: setPlan, people } = useMealPlan();
   const [servings, setServings] = useState(recipe.servings);
