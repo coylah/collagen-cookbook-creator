@@ -1,67 +1,61 @@
-# Collagen Kitchen — Test Build Plan
 
-Yes, exactly right. We build the whole app once, seed it with your 5 test recipes, you click around and break it, then I drop in the full JSON in one go (no rebuild, just data).
+# Love Coylah · The Collagen Kitchen — Plan v3 (locked)
 
-## What gets built (one pass)
+Your answers are baked in. Ready to build on your "go".
 
-**Design**
-- Soft, warm, feminine — cream/sand background, sage + terracotta accents, serif headings (Fraunces) + clean body (Inter)
-- Photo placeholder = gradient block + meal-type icon (so empty photos still look intentional)
+---
 
-**Pages**
-1. **Home / Cookbook** — recipe grid, search bar, filter bar
-   - Filters: meal type · tag (high-protein, low-carb, quick…) · max total time · collagen-boost toggle · ingredient search ("what's in my fridge")
-   - Sort: name, time, newest
-2. **Recipe detail** — hero, meta (prep/cook/servings), serving scaler (±, scales all qty), ingredients (checkable), method (checkable steps), notes, collagen tip callout, "♥ Save", "+ Add to meal plan"
-3. **Favourites** — saved recipes (localStorage)
-4. **Meal Planner** — Mon–Sun × Breakfast/Lunch/Dinner/Snack grid, drag-or-tap to assign, "people cooking for" number
-5. **Shopping List** — auto-generated from the week's plan, grouped by category (produce / protein / dairy / pantry), aggregated quantities where units match, checkable, printable
-6. **Admin / Import** (hidden link) — paste JSON → preview → import. This is how I load your test 5 now and your full set later.
+## Decisions locked
 
-**Data**
-- Lovable Cloud (Postgres) for recipes
-- localStorage for favourites + meal plan + servings (no login needed)
+- **Glow Bowl → shopping:** Pattern A — build your bowl, tap "Add bowl to shopping list", done.
+- **Signature font:** elegant script — I'll use **Pinyon Script** (delicate, editorial) for the "Love Coylah" signature. If it feels too thin in preview I'll swap to Allura.
+- **Collagen boost filter:** keep, but rename to **"Super Boost"** and reserve only for the top collagen-density recipes (bone broth, salmon, slow-cooked beef etc.). I'll re-flag the database so only ~5–8 recipes carry it.
+- **Wording:** no "pantry" anywhere. Replace with **"Cupboard staples"** (shopping list section) and **"cupboard"** as the ingredient category label.
 
-**Schema (one table)**
-```
-recipes
-  id · name · slug · meal_type · tags[] · servings · prep_min · cook_min
-  ingredients (jsonb: [{qty, unit, item, category}])
-  method (jsonb: string[])
-  notes · collagen_boost · collagen_tip · image_url · created_at
-```
+---
 
-## Order of work
+## Build order
 
-1. Enable Lovable Cloud + create `recipes` table
-2. Build design system + layout shell + nav
-3. Cookbook page (grid + filters + search)
-4. Recipe detail (scaler + check-off)
-5. Favourites
-6. Meal planner
-7. Shopping list (aggregation logic)
-8. Admin import page
-9. Import your 5 test recipes — we test everything end-to-end
-10. You send full JSON → I paste into admin → done
+### 1. Data
+- Import the 15 new lunches from your attached JSON.
+- Re-flag `collagen_boost = true` on only the genuine top-collagen recipes; clear it on the rest.
+- Rename the ingredient `category: "pantry"` → `"cupboard"` across all recipes.
 
-## What you'll test on the 5 recipes
+### 2. Cookbook ordering
+- Group by meal type (Breakfast → Lunch → Dinner → Snack → Dessert), alphabetical within each group, with soft section headers.
 
-- Cards render, photos placeholder looks good
-- Filter by breakfast / high-protein / quick / collagen-boost all return correct results
-- Ingredient search ("eggs") finds the right recipes
-- Open recipe → bump servings 1 → 4, all quantities scale
-- Save 2 favourites, refresh page, still there
-- Drop recipes into Mon breakfast, Tue lunch etc.
-- Shopping list aggregates (e.g. eggs from two recipes combine)
-- Print shopping list looks clean
+### 3. Rebrand (Love Coylah premium editorial)
+- Palette: off-white `#FBF7F4`, charcoal `#1F1A1A`, blush `#E8C7C0`, rose `#C9485B`, occasional deep navy `#1B2240`. Sage retired.
+- Fonts: Fraunces (display), Inter (body), **Pinyon Script** (signature only).
+- Header: small "Love Coylah" script signature, "The Collagen Kitchen" wordmark, tagline "Age Slow · Reclaim Your Glow".
+- Footer: signature + tagline.
+- Homepage hero: your exact copy (BEAUTY STARTS IN THE KITCHEN / The Collagen Kitchen / sub / supporting line).
+- Recipe cards: slimmer image area, soft blush gradient + thin line icon placeholder (no cartoon emoji).
+- Recipe page: "WHY YOUR SKIN WILL LOVE THIS" + **Coylah's Tips** (script flourish on "Coylah's").
+- Super Boost filter chip restyled in rose.
 
-## Not in this build (on purpose, saves credits)
+### 4. Overnight Beauty Oats — Build Your Beauty Oats
+- One recipe page, base recipe stays at top.
+- Below: "BUILD YOUR BEAUTY OATS" section with your intro, 5 topping categories as chip groups, frozen fruit tip callout, 8 flavour combo tiles.
 
-- User accounts / login
-- AI photo generation
-- Nutrition calculation
-- Sharing / social
+### 5. Build Your Own Glow Bowl (new page under Lunches)
+- 6-step builder (Base → Protein → Colour → Fats → Crunch → Dressing).
+- Sticky "Your bowl" summary panel.
+- 10 ready-made bowl preset tiles at the top (tap to pre-fill, then tweak).
+- "Add bowl to shopping list" button.
 
-## Approve & I'll start
+### 6. Shopping list intelligence
+- **Quantity logic:**
+  - Show exact quantity for: protein, produce in discrete units (peppers, lemons, avocados, sweet potatoes), and items measured in g/kg/ml/L above threshold.
+  - Show as cupboard staple (no quantity) for: oils, vinegars, spices, herbs, seeds, condiments, tsp/tbsp items.
+  - Produce rounds up to whole units (½ + ½ tomato = 1; lone ½ cauliflower = 1).
+  - Handfuls / pinches → cupboard staple style.
+- **"I have this" toggle:** each item gets a second action that moves it to a collapsed **"Already in my cupboard"** section at the bottom. Remembered in local storage. Reset button clears it.
+- Section headings reworded: "Cupboard staples" replaces any "Pantry" label.
 
-Reply "go" and I'll build it, seed your 5 recipes, and hand you a preview link to break.
+---
+
+## Estimated passes
+~1 small (data + ordering), ~1 medium (rebrand), ~1 medium (two Build-Your-Own pages), ~1 small (shopping logic). I'll batch aggressively to keep credits low.
+
+Reply **"go"** and I'll start.

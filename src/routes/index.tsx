@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Search, Sparkles, Filter } from "lucide-react";
+import { Search, Sparkles, Filter, Salad, ArrowRight } from "lucide-react";
 import { listRecipes } from "@/lib/recipes.functions";
 import { AppShell } from "@/components/app-shell";
 import { RecipeCard } from "@/components/recipe-card";
@@ -16,16 +16,16 @@ const recipesQuery = queryOptions({
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "The Collagen Kitchen — Recipes that love your skin" },
+      { title: "The Collagen Kitchen — Love Coylah" },
       {
         name: "description",
         content:
-          "A beautiful, filterable cookbook of high-protein, collagen-supporting recipes. Save favourites, plan your week, generate a shopping list.",
+          "Skin-food recipes to help you age slow and reclaim your glow. Browse, save, plan and shop collagen-supporting meals.",
       },
-      { property: "og:title", content: "The Collagen Kitchen" },
+      { property: "og:title", content: "The Collagen Kitchen — Love Coylah" },
       {
         property: "og:description",
-        content: "Browse, filter and plan collagen-supporting recipes.",
+        content: "Skin-food recipes to help you age slow and reclaim your glow.",
       },
     ],
   }),
@@ -43,16 +43,21 @@ export const Route = createFileRoute("/")({
   ),
 });
 
+const MEAL_ORDER = ["breakfast", "lunch", "dinner", "snack", "dessert"];
+
 function Cookbook() {
   const { data: recipes } = useSuspenseQuery(recipesQuery);
   const [search, setSearch] = useState("");
   const [meal, setMeal] = useState<string>("all");
   const [tag, setTag] = useState<string>("all");
   const [maxTime, setMaxTime] = useState<number>(0);
-  const [collagenOnly, setCollagenOnly] = useState(false);
+  const [boostOnly, setBoostOnly] = useState(false);
 
   const mealTypes = useMemo(
-    () => Array.from(new Set(recipes.map((r) => r.meal_type))).sort(),
+    () =>
+      Array.from(new Set(recipes.map((r) => r.meal_type))).sort(
+        (a, b) => (MEAL_ORDER.indexOf(a) + 99) - (MEAL_ORDER.indexOf(b) + 99),
+      ),
     [recipes],
   );
   const tags = useMemo(
@@ -62,44 +67,85 @@ function Cookbook() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return recipes.filter((r) => {
-      if (meal !== "all" && r.meal_type !== meal) return false;
-      if (tag !== "all" && !r.tags.includes(tag)) return false;
-      if (collagenOnly && !r.collagen_boost) return false;
-      if (maxTime > 0 && r.prep_min + r.cook_min > maxTime) return false;
-      if (q) {
-        const hay =
-          r.name.toLowerCase() +
-          " " +
-          r.tags.join(" ").toLowerCase() +
-          " " +
-          r.ingredients.map((i) => i.item).join(" ").toLowerCase();
-        if (!hay.includes(q)) return false;
-      }
-      return true;
-    });
-  }, [recipes, search, meal, tag, maxTime, collagenOnly]);
+    return recipes
+      .filter((r) => {
+        if (meal !== "all" && r.meal_type !== meal) return false;
+        if (tag !== "all" && !r.tags.includes(tag)) return false;
+        if (boostOnly && !r.collagen_boost) return false;
+        if (maxTime > 0 && r.prep_min + r.cook_min > maxTime) return false;
+        if (q) {
+          const hay =
+            r.name.toLowerCase() +
+            " " +
+            r.tags.join(" ").toLowerCase() +
+            " " +
+            r.ingredients.map((i) => i.item).join(" ").toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        const ma = MEAL_ORDER.indexOf(a.meal_type);
+        const mb = MEAL_ORDER.indexOf(b.meal_type);
+        const oa = ma === -1 ? 99 : ma;
+        const ob = mb === -1 ? 99 : mb;
+        if (oa !== ob) return oa - ob;
+        return a.name.localeCompare(b.name);
+      });
+  }, [recipes, search, meal, tag, maxTime, boostOnly]);
+
+  // Group filtered recipes by meal type for section headers
+  const grouped = useMemo(() => {
+    const g: Record<string, typeof filtered> = {};
+    for (const r of filtered) (g[r.meal_type] ??= []).push(r);
+    return g;
+  }, [filtered]);
 
   return (
     <AppShell>
       {/* Hero */}
-      <section className="border-b bg-gradient-to-br from-cream via-background to-accent/30">
-        <div className="mx-auto max-w-6xl px-4 py-12 sm:py-16">
-          <p className="font-serif text-sm uppercase tracking-[0.2em] text-primary">
+      <section className="border-b border-border/50 bg-gradient-to-br from-background via-background to-primary/20">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
+          <p className="font-serif text-[11px] uppercase tracking-[0.28em] text-secondary">
             Beauty starts in the kitchen
           </p>
-          <h1 className="mt-3 font-serif text-4xl leading-tight sm:text-5xl">
-            Recipes that love your skin back.
+          <h1 className="mt-4 font-serif text-5xl leading-[1.05] sm:text-6xl">
+            The Collagen Kitchen
           </h1>
-          <p className="mt-4 max-w-2xl text-muted-foreground">
-            Browse, filter, save your favourites and plan the week. Every recipe is
-            built to support collagen, protein and a glowing routine.
+          <p className="mt-5 max-w-2xl text-base text-foreground/75 sm:text-lg">
+            Skin-food recipes to help you age slow &amp; reclaim your glow — and build
+            collagen from the inside out.
+          </p>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Browse, save, plan your week and build a shopping list from simple
+            collagen-supporting meals.
           </p>
         </div>
       </section>
 
+      {/* Build Your Own callout */}
+      <section className="mx-auto max-w-6xl px-4 pt-8">
+        <Link
+          to="/build/glow-bowl"
+          className="group flex items-center justify-between gap-4 rounded-2xl border border-secondary/30 bg-gradient-to-r from-primary/30 via-primary/15 to-transparent p-5 transition-colors hover:border-secondary/60"
+        >
+          <div className="flex items-center gap-4">
+            <span className="grid h-11 w-11 place-items-center rounded-full bg-secondary text-secondary-foreground">
+              <Salad className="h-5 w-5" />
+            </span>
+            <div>
+              <p className="font-serif text-lg">Build Your Own Glow Bowl</p>
+              <p className="text-sm text-muted-foreground">
+                Mix &amp; match a collagen-loaded lunch in six tiny steps.
+              </p>
+            </div>
+          </div>
+          <ArrowRight className="h-5 w-5 text-secondary transition-transform group-hover:translate-x-1" />
+        </Link>
+      </section>
+
       {/* Filters */}
-      <section className="sticky top-[65px] z-30 border-b bg-background/90 backdrop-blur">
+      <section className="sticky top-[63px] z-30 mt-6 border-y border-border/60 bg-background/90 backdrop-blur">
         <div className="mx-auto max-w-6xl space-y-3 px-4 py-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -126,11 +172,12 @@ function Cookbook() {
             ))}
             <span className="mx-1 h-5 w-px bg-border" />
             <Button
-              variant={collagenOnly ? "default" : "outline"}
+              variant={boostOnly ? "default" : "outline"}
               size="sm"
-              onClick={() => setCollagenOnly((v) => !v)}
+              onClick={() => setBoostOnly((v) => !v)}
+              className={boostOnly ? "bg-secondary text-secondary-foreground hover:bg-secondary/90" : ""}
             >
-              <Sparkles className="h-3.5 w-3.5" /> Collagen boost
+              <Sparkles className="h-3.5 w-3.5" /> Super Boost
             </Button>
             <select
               value={tag}
@@ -162,16 +209,29 @@ function Cookbook() {
         </div>
       </section>
 
-      {/* Grid */}
-      <section className="mx-auto max-w-6xl px-4 py-8">
+      {/* Grid grouped by meal type */}
+      <section className="mx-auto max-w-6xl px-4 py-10">
         {filtered.length === 0 ? (
           <p className="py-16 text-center text-muted-foreground">
             No recipes match those filters yet.
           </p>
         ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((r) => (
-              <RecipeCard key={r.id} recipe={r} />
+          <div className="space-y-12">
+            {Object.entries(grouped).map(([mealType, items]) => (
+              <div key={mealType}>
+                <div className="mb-5 flex items-baseline gap-3">
+                  <h2 className="font-serif text-2xl capitalize">{mealType}</h2>
+                  <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                    {items.length} {items.length === 1 ? "recipe" : "recipes"}
+                  </span>
+                  <span className="ml-2 h-px flex-1 bg-border/60" />
+                </div>
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {items.map((r) => (
+                    <RecipeCard key={r.id} recipe={r} />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         )}
@@ -196,7 +256,7 @@ function FilterChip({
       className={
         "rounded-full border px-3 py-1 text-xs capitalize transition-colors " +
         (active
-          ? "border-primary bg-primary text-primary-foreground"
+          ? "border-foreground bg-foreground text-background"
           : "border-input bg-background text-foreground/70 hover:bg-accent")
       }
     >

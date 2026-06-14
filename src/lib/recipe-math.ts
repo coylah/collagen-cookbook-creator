@@ -19,7 +19,6 @@ export function parseQty(qty: string): number | null {
 
 export function formatQty(n: number): string {
   if (Math.abs(n - Math.round(n)) < 0.01) return String(Math.round(n));
-  // common fractions
   const fracs: [number, string][] = [
     [0.25, "¼"],
     [0.33, "⅓"],
@@ -45,7 +44,8 @@ export function scaleRecipe(r: Recipe, newServings: number) {
   return r.ingredients.map((i) => scaleIngredient(i, factor));
 }
 
-// Aggregate ingredients across recipes for shopping list.
+// --- Shopping list aggregation ---
+
 export type ShoppingItem = {
   item: string;
   unit: string;
@@ -53,10 +53,33 @@ export type ShoppingItem = {
   qtyText: string; // displayed
   category: string;
   fromRecipes: string[];
+  staple: boolean; // cupboard/seasoning/oil — no quantity shown
+  key: string;
 };
 
 function normItem(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+}
+
+const STAPLE_CATEGORIES = new Set(["cupboard", "pantry", "herbs", "spices", "fats"]);
+const STAPLE_UNITS = new Set([
+  "tsp", "tbsp", "teaspoon", "tablespoon",
+  "pinch", "pinches", "dash", "splash", "drizzle",
+  "handful", "handfuls",
+]);
+// Produce items that come in discrete whole units when unit is empty
+const PRODUCE_CATEGORIES = new Set(["produce"]);
+
+function isStaple(ing: { category: string; unit: string }): boolean {
+  if (STAPLE_CATEGORIES.has(ing.category.toLowerCase())) return true;
+  if (STAPLE_UNITS.has(ing.unit.toLowerCase())) return true;
+  return false;
+}
+
+export function shoppingItemKey(item: string, unit: string, staple: boolean) {
+  return staple
+    ? `staple|${normItem(item)}`
+    : `${normItem(item)}|${unit.toLowerCase()}`;
 }
 
 export function buildShoppingList(
@@ -66,17 +89,14 @@ export function buildShoppingList(
   for (const { recipe, servings } of entries) {
     const factor = servings / recipe.servings;
     for (const ing of recipe.ingredients) {
-      const key = `${normItem(ing.item)}|${ing.unit.toLowerCase()}`;
+      const staple = isStaple(ing);
+      const key = shoppingItemKey(ing.item, ing.unit, staple);
       const n = parseQty(ing.qty);
       const scaled = n != null ? n * factor : null;
       const existing = map.get(key);
       if (existing) {
-        if (existing.qty != null && scaled != null) {
+        if (!staple && existing.qty != null && scaled != null) {
           existing.qty += scaled;
-          existing.qtyText = formatQty(existing.qty);
-        } else if (scaled != null) {
-          existing.qty = scaled;
-          existing.qtyText = formatQty(scaled);
         }
         if (!existing.fromRecipes.includes(recipe.name))
           existing.fromRecipes.push(recipe.name);
@@ -85,13 +105,35 @@ export function buildShoppingList(
           item: ing.item,
           unit: ing.unit,
           qty: scaled,
-          qtyText: scaled != null ? formatQty(scaled) : ing.qty,
+          qtyText: "",
           category: ing.category || "other",
           fromRecipes: [recipe.name],
+          staple,
+          key,
         });
       }
     }
   }
+
+  // Compute display quantity per item with smart rounding
+  for (const item of map.values()) {
+    if (item.staple) {
+      item.qtyText = "";
+      continue;
+    }
+    if (item.qty == null) {
+      item.qtyText = "";
+      continue;
+    }
+    // Produce with empty unit → round up to whole (you don't buy half a cauliflower)
+    if (PRODUCE_CATEGORIES.has(item.category.toLowerCase()) && !item.unit) {
+      item.qty = Math.ceil(item.qty);
+      item.qtyText = String(item.qty);
+      continue;
+    }
+    item.qtyText = formatQty(item.qty);
+  }
+
   return Array.from(map.values()).sort((a, b) =>
     a.category.localeCompare(b.category) || a.item.localeCompare(b.item),
   );

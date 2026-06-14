@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { useFavourites, useMealPlan, DAYS, SLOTS, type Slot } from "@/lib/user-state";
 import { scaleRecipe } from "@/lib/recipe-math";
 import { cn } from "@/lib/utils";
+import { BuildYourBeautyOats } from "@/components/build-your-beauty-oats";
 
 const recipeQuery = (slug: string) =>
   queryOptions({
@@ -59,7 +60,7 @@ export const Route = createFileRoute("/recipes/$slug")({
     <AppShell>
       <div className="mx-auto max-w-3xl p-8 text-center">
         <p className="text-muted-foreground">Recipe not found.</p>
-        <Link to="/" className="mt-4 inline-block text-primary underline">
+        <Link to="/" className="mt-4 inline-block text-secondary underline">
           Back to cookbook
         </Link>
       </div>
@@ -82,6 +83,7 @@ function RecipePage() {
   );
 
   const total = recipe.prep_min + recipe.cook_min;
+  const isOats = recipe.slug === "overnight-beauty-oats";
 
   return (
     <AppShell>
@@ -93,7 +95,7 @@ function RecipePage() {
           <ArrowLeft className="h-3.5 w-3.5" /> Back to cookbook
         </Link>
 
-        <div className="overflow-hidden rounded-3xl border bg-card shadow-sm">
+        <div className="overflow-hidden rounded-3xl border border-border/60 bg-card shadow-sm">
           <div className="relative aspect-[16/9] w-full">
             {recipe.image_url ? (
               <img
@@ -106,7 +108,7 @@ function RecipePage() {
             )}
           </div>
           <div className="p-6 sm:p-10">
-            <p className="text-xs uppercase tracking-[0.2em] text-primary">
+            <p className="text-[11px] uppercase tracking-[0.22em] text-secondary">
               {recipe.meal_type}
             </p>
             <h1 className="mt-2 font-serif text-3xl sm:text-4xl">{recipe.name}</h1>
@@ -118,7 +120,7 @@ function RecipePage() {
               </span>
               {recipe.collagen_boost && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs text-secondary-foreground">
-                  <Sparkles className="h-3 w-3" /> Collagen boost
+                  <Sparkles className="h-3 w-3" /> Super Boost
                 </span>
               )}
             </div>
@@ -137,16 +139,17 @@ function RecipePage() {
             )}
 
             {/* Action bar */}
-            <div className="no-print mt-6 flex flex-wrap items-center gap-2 border-t pt-6">
+            <div className="no-print mt-6 flex flex-wrap items-center gap-2 border-t border-border/60 pt-6">
               <Button
                 variant={isFav(recipe.slug) ? "default" : "outline"}
                 size="sm"
                 onClick={() => toggle(recipe.slug)}
+                className={isFav(recipe.slug) ? "bg-secondary text-secondary-foreground hover:bg-secondary/90" : ""}
               >
                 <Heart
                   className={cn(
                     "h-4 w-4",
-                    isFav(recipe.slug) && "fill-primary-foreground",
+                    isFav(recipe.slug) && "fill-secondary-foreground",
                   )}
                 />
                 {isFav(recipe.slug) ? "Saved" : "Save"}
@@ -170,6 +173,13 @@ function RecipePage() {
                   setShowPlanPicker(false);
                 }}
               />
+            )}
+
+            {isOats && (
+              <p className="mt-6 rounded-xl border border-secondary/30 bg-primary/15 p-3 text-sm text-foreground/80">
+                This is the <strong>base recipe</strong>. Scroll down for the
+                Build Your Beauty Oats guide with toppings &amp; flavour combos.
+              </p>
             )}
 
             <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_1.3fr]">
@@ -203,7 +213,7 @@ function RecipePage() {
                       <label className="flex cursor-pointer items-start gap-3 rounded-lg px-2 py-1.5 hover:bg-muted/60">
                         <input
                           type="checkbox"
-                          className="mt-1 h-4 w-4 accent-primary"
+                          className="mt-1 h-4 w-4 accent-secondary"
                           checked={!!checkedIng[i]}
                           onChange={() =>
                             setCheckedIng((c) => ({ ...c, [i]: !c[i] }))
@@ -237,7 +247,7 @@ function RecipePage() {
                           className={cn(
                             "grid h-6 w-6 shrink-0 place-items-center rounded-full border text-xs font-semibold",
                             checkedStep[i]
-                              ? "border-primary bg-primary text-primary-foreground"
+                              ? "border-secondary bg-secondary text-secondary-foreground"
                               : "border-input text-foreground/70",
                           )}
                           onClick={(e) => {
@@ -280,17 +290,33 @@ function RecipePage() {
             )}
 
             {recipe.collagen_tip && (
-              <aside className="mt-4 rounded-2xl border border-secondary bg-secondary/40 p-5">
-                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-secondary-foreground">
-                  <Sparkles className="h-3.5 w-3.5" /> Why it loves your skin
+              <aside className="mt-4 rounded-2xl border border-secondary/30 bg-primary/20 p-5">
+                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-secondary">
+                  <Sparkles className="h-3.5 w-3.5" /> Why your skin will love this
                 </p>
-                <p className="mt-2 text-sm leading-relaxed text-secondary-foreground">
+                <p className="mt-2 text-sm leading-relaxed text-foreground/85">
                   {recipe.collagen_tip}
                 </p>
               </aside>
             )}
+
+            <aside className="mt-4 rounded-2xl border border-border/70 bg-card p-5">
+              <p className="flex items-baseline gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                <span className="font-script text-xl normal-case tracking-normal text-secondary/90">
+                  Coylah's
+                </span>
+                Tips
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-foreground/80">
+                Pair this with a glass of water, a vitamin C–rich fruit, or a small
+                handful of nuts to extend the collagen-supporting hit. Real food
+                first, supplements second.
+              </p>
+            </aside>
           </div>
         </div>
+
+        {isOats && <BuildYourBeautyOats />}
       </article>
     </AppShell>
   );
@@ -325,7 +351,7 @@ function Row({ day, onPick }: { day: string; onPick: (d: string, s: Slot) => voi
         <button
           key={s}
           onClick={() => onPick(day, s)}
-          className="rounded-md border bg-background py-1 transition-colors hover:border-primary hover:bg-primary/10"
+          className="rounded-md border bg-background py-1 transition-colors hover:border-secondary hover:bg-secondary/10"
         >
           +
         </button>
