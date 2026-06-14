@@ -1,0 +1,1 @@
+DELETE FROM public.recipes WHERE slug = 'test-x';
