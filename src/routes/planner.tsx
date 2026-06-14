@@ -122,10 +122,10 @@ function DayRow({
 }: {
   day: string;
   plan: ReturnType<typeof useMealPlan>["plan"];
-  bySlug: Map<string, ReturnType<typeof useSuspenseQuery<typeof recipesQuery>>["data"][number]>;
+  bySlug: Map<string, Recipe>;
   onSet: ReturnType<typeof useMealPlan>["set"];
   people: number;
-  recipes: ReturnType<typeof useSuspenseQuery<typeof recipesQuery>>["data"];
+  recipes: Recipe[];
 }) {
   return (
     <>
