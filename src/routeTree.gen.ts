@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PlannerRouteImport } from './routes/planner'
 import { Route as FavouritesRouteImport } from './routes/favourites'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecipesSlugRouteImport } from './routes/recipes.$slug'
 
+const PlannerRoute = PlannerRouteImport.update({
+  id: '/planner',
+  path: '/planner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FavouritesRoute = FavouritesRouteImport.update({
   id: '/favourites',
   path: '/favourites',
@@ -32,35 +38,46 @@ const RecipesSlugRoute = RecipesSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/favourites': typeof FavouritesRoute
+  '/planner': typeof PlannerRoute
   '/recipes/$slug': typeof RecipesSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/favourites': typeof FavouritesRoute
+  '/planner': typeof PlannerRoute
   '/recipes/$slug': typeof RecipesSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/favourites': typeof FavouritesRoute
+  '/planner': typeof PlannerRoute
   '/recipes/$slug': typeof RecipesSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/favourites' | '/recipes/$slug'
+  fullPaths: '/' | '/favourites' | '/planner' | '/recipes/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/favourites' | '/recipes/$slug'
-  id: '__root__' | '/' | '/favourites' | '/recipes/$slug'
+  to: '/' | '/favourites' | '/planner' | '/recipes/$slug'
+  id: '__root__' | '/' | '/favourites' | '/planner' | '/recipes/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FavouritesRoute: typeof FavouritesRoute
+  PlannerRoute: typeof PlannerRoute
   RecipesSlugRoute: typeof RecipesSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/planner': {
+      id: '/planner'
+      path: '/planner'
+      fullPath: '/planner'
+      preLoaderRoute: typeof PlannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/favourites': {
       id: '/favourites'
       path: '/favourites'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FavouritesRoute: FavouritesRoute,
+  PlannerRoute: PlannerRoute,
   RecipesSlugRoute: RecipesSlugRoute,
 }
 export const routeTree = rootRouteImport
