@@ -14,6 +14,7 @@ import { Route as PlannerRouteImport } from './routes/planner'
 import { Route as FavouritesRouteImport } from './routes/favourites'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecipesSlugRouteImport } from './routes/recipes.$slug'
+import { Route as AdminImportRouteImport } from './routes/admin.import'
 
 const ShoppingRoute = ShoppingRouteImport.update({
   id: '/shopping',
@@ -40,12 +41,18 @@ const RecipesSlugRoute = RecipesSlugRouteImport.update({
   path: '/recipes/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminImportRoute = AdminImportRouteImport.update({
+  id: '/admin/import',
+  path: '/admin/import',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/favourites': typeof FavouritesRoute
   '/planner': typeof PlannerRoute
   '/shopping': typeof ShoppingRoute
+  '/admin/import': typeof AdminImportRoute
   '/recipes/$slug': typeof RecipesSlugRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/favourites': typeof FavouritesRoute
   '/planner': typeof PlannerRoute
   '/shopping': typeof ShoppingRoute
+  '/admin/import': typeof AdminImportRoute
   '/recipes/$slug': typeof RecipesSlugRoute
 }
 export interface FileRoutesById {
@@ -61,19 +69,33 @@ export interface FileRoutesById {
   '/favourites': typeof FavouritesRoute
   '/planner': typeof PlannerRoute
   '/shopping': typeof ShoppingRoute
+  '/admin/import': typeof AdminImportRoute
   '/recipes/$slug': typeof RecipesSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/favourites' | '/planner' | '/shopping' | '/recipes/$slug'
+  fullPaths:
+    | '/'
+    | '/favourites'
+    | '/planner'
+    | '/shopping'
+    | '/admin/import'
+    | '/recipes/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/favourites' | '/planner' | '/shopping' | '/recipes/$slug'
+  to:
+    | '/'
+    | '/favourites'
+    | '/planner'
+    | '/shopping'
+    | '/admin/import'
+    | '/recipes/$slug'
   id:
     | '__root__'
     | '/'
     | '/favourites'
     | '/planner'
     | '/shopping'
+    | '/admin/import'
     | '/recipes/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -82,6 +104,7 @@ export interface RootRouteChildren {
   FavouritesRoute: typeof FavouritesRoute
   PlannerRoute: typeof PlannerRoute
   ShoppingRoute: typeof ShoppingRoute
+  AdminImportRoute: typeof AdminImportRoute
   RecipesSlugRoute: typeof RecipesSlugRoute
 }
 
@@ -122,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecipesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/import': {
+      id: '/admin/import'
+      path: '/admin/import'
+      fullPath: '/admin/import'
+      preLoaderRoute: typeof AdminImportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -130,6 +160,7 @@ const rootRouteChildren: RootRouteChildren = {
   FavouritesRoute: FavouritesRoute,
   PlannerRoute: PlannerRoute,
   ShoppingRoute: ShoppingRoute,
+  AdminImportRoute: AdminImportRoute,
   RecipesSlugRoute: RecipesSlugRoute,
 }
 export const routeTree = rootRouteImport
