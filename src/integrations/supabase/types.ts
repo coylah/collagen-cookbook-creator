@@ -14,7 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      recipes: {
+        Row: {
+          collagen_boost: boolean
+          collagen_tip: string | null
+          cook_min: number
+          created_at: string
+          id: string
+          image_url: string | null
+          ingredients: Json
+          meal_type: string
+          method: Json
+          name: string
+          notes: string | null
+          prep_min: number
+          servings: number
+          slug: string
+          tags: string[]
+        }
+        Insert: {
+          collagen_boost?: boolean
+          collagen_tip?: string | null
+          cook_min?: number
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          ingredients?: Json
+          meal_type: string
+          method?: Json
+          name: string
+          notes?: string | null
+          prep_min?: number
+          servings?: number
+          slug: string
+          tags?: string[]
+        }
+        Update: {
+          collagen_boost?: boolean
+          collagen_tip?: string | null
+          cook_min?: number
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          ingredients?: Json
+          meal_type?: string
+          method?: Json
+          name?: string
+          notes?: string | null
+          prep_min?: number
+          servings?: number
+          slug?: string
+          tags?: string[]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
