@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Search, Sparkles, Filter, Salad, ArrowRight, BookOpen } from "lucide-react";
+import { Search, Sparkles, Filter, Salad, BookOpen } from "lucide-react";
 import { listRecipes } from "@/lib/recipes.functions";
 import { AppShell } from "@/components/app-shell";
 import { RecipeCard } from "@/components/recipe-card";
@@ -43,8 +43,7 @@ export const Route = createFileRoute("/")(({
   ),
 }));
 
-const MEAL_ORDER = ["breakfast", "lunch", "dinner", "snack", "dessert"];
-
+const MEAL_ORDER = ["breakfast", "lunch", "dinner", "snack", "smoothie", "dessert"];
 const MAX_TAGS = 20;
 
 function Cookbook() {
@@ -138,6 +137,7 @@ function Cookbook() {
 
   return (
     <AppShell>
+      {/* Hero */}
       <section className="border-b border-border/50 bg-gradient-to-br from-background via-background to-primary/20">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
           <p className="font-serif text-[11px] uppercase tracking-[0.28em] text-secondary">
@@ -157,40 +157,31 @@ function Cookbook() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 pt-8">
-        <Link
-          to="/build/glow-bowl"
-          className="group flex items-center justify-between gap-4 rounded-2xl border border-secondary/30 bg-gradient-to-r from-primary/30 via-primary/15 to-transparent p-5 transition-colors hover:border-secondary/60"
-        >
-          <div className="flex items-center gap-4">
-            <span className="grid h-11 w-11 place-items-center rounded-full bg-secondary text-secondary-foreground">
-              <Salad className="h-5 w-5" />
-            </span>
-            <div>
-              <p className="font-serif text-lg">Build Your Own Glow Bowl</p>
-              <p className="text-sm text-muted-foreground">
-                Mix &amp; match a collagen-loaded lunch in six tiny steps.
-              </p>
-            </div>
-          </div>
-          <ArrowRight className="h-5 w-5 text-secondary transition-transform group-hover:translate-x-1" />
-        </Link>
-      </section>
-
-      <section className="sticky top-[63px] z-30 mt-6 border-y border-border/60 bg-background/90 backdrop-blur">
+      {/* Filters + Glow Bowl link tucked in */}
+      <section className="sticky top-[63px] z-30 mt-0 border-b border-border/60 bg-background/90 backdrop-blur">
         <div className="mx-auto max-w-6xl space-y-3 px-4 py-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search recipes or ingredients (e.g. eggs, spinach)"
-              className="pl-9"
-            />
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search recipes or ingredients…"
+                className="pl-9"
+              />
+            </div>
+            <Link
+              to="/build/glow-bowl"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-secondary/40 bg-secondary/10 px-3.5 py-2 text-xs text-secondary transition-colors hover:bg-secondary/20"
+            >
+              <Salad className="h-3.5 w-3.5" />
+              Build a Glow Bowl
+            </Link>
           </div>
           <div className="flex flex-wrap items-center gap-2 text-sm">
+            <span className="text-xs text-muted-foreground">Filter by:</span>
             <FilterChip
-              label="All meals"
+              label="All"
               active={meal === "all"}
               onClick={() => setMeal("all")}
             />
@@ -217,7 +208,7 @@ function Cookbook() {
                 onChange={(e) => setTag(e.target.value)}
                 className="h-8 rounded-md border border-input bg-background px-2 text-xs"
               >
-                <option value="all">Any tag</option>
+                <option value="all">Tag: all</option>
                 {tags.map((t) => (
                   <option key={t} value={t}>
                     {t}
@@ -230,11 +221,11 @@ function Cookbook() {
               onChange={(e) => setMaxTime(Number(e.target.value))}
               className="h-8 rounded-md border border-input bg-background px-2 text-xs"
             >
-              <option value={0}>Any time</option>
-              <option value={15}>≤ 15 min</option>
-              <option value={30}>≤ 30 min</option>
-              <option value={45}>≤ 45 min</option>
-              <option value={60}>≤ 60 min</option>
+              <option value={0}>Time: any</option>
+              <option value={15}>Under 15 min</option>
+              <option value={30}>Under 30 min</option>
+              <option value={45}>Under 45 min</option>
+              <option value={60}>Under 60 min</option>
             </select>
             <span className="ml-auto inline-flex items-center gap-1 text-xs text-muted-foreground">
               <Filter className="h-3 w-3" /> {filtered.length} of {recipes.length}
@@ -243,6 +234,7 @@ function Cookbook() {
         </div>
       </section>
 
+      {/* Recipe grid */}
       <section className="mx-auto max-w-6xl px-4 py-10">
         {filtered.length === 0 ? (
           <p className="py-16 text-center text-muted-foreground">
