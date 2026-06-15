@@ -33,17 +33,15 @@ type Step = {
   key: string;
   title: string;
   intro: string;
-  max: number;
   category: string;
-  options: { label: string; ingredients?: string }[];
+  options: { label: string; ingredients?: string[] }[];
 };
 
 const STEPS: Step[] = [
   {
     key: "base",
     title: "1 · Choose your base",
-    intro: "Pick one.",
-    max: 1,
+    intro: "Pick one or mix two.",
     category: "grains",
     options: [
       { label: "Brown rice" },
@@ -67,7 +65,6 @@ const STEPS: Step[] = [
     key: "protein",
     title: "2 · Add your protein",
     intro: "Pick one.",
-    max: 1,
     category: "protein",
     options: [
       { label: "Grilled chicken" },
@@ -77,7 +74,6 @@ const STEPS: Step[] = [
       { label: "Tuna" },
       { label: "Salmon" },
       { label: "Mackerel" },
-      { label: "Sardines" },
       { label: "Prawns" },
       { label: "Boiled eggs" },
       { label: "Beef strips" },
@@ -85,14 +81,12 @@ const STEPS: Step[] = [
       { label: "Pork slices" },
       { label: "Halloumi" },
       { label: "Cottage cheese" },
-      { label: "Greek yogurt dressing on the side" },
     ],
   },
   {
     key: "colour",
     title: "3 · Add colour & vitamin C",
-    intro: "Pick two or three.",
-    max: 3,
+    intro: "Pick two or three — the more colour the better.",
     category: "produce",
     options: [
       { label: "Red pepper" },
@@ -121,7 +115,6 @@ const STEPS: Step[] = [
     key: "fats",
     title: "4 · Add healthy fats",
     intro: "Pick one.",
-    max: 1,
     category: "fats",
     options: [
       { label: "Avocado" },
@@ -130,17 +123,12 @@ const STEPS: Step[] = [
       { label: "Feta" },
       { label: "Nuts" },
       { label: "Seeds" },
-      { label: "Peanut butter dressing" },
-      { label: "Tahini dressing" },
-      { label: "Greek yogurt dressing" },
-      { label: "Salmon or mackerel" },
     ],
   },
   {
     key: "crunch",
     title: "5 · Add crunch & minerals",
     intro: "Pick one.",
-    max: 1,
     category: "cupboard",
     options: [
       { label: "Pumpkin seeds" },
@@ -159,33 +147,32 @@ const STEPS: Step[] = [
   {
     key: "dressing",
     title: "6 · Add a dressing",
-    intro: "Pick one.",
-    max: 1,
+    intro: "Pick one — just mix all the ingredients together and season to taste.",
     category: "cupboard",
     options: [
       {
         label: "Lemon Yogurt",
-        ingredients: "Greek yogurt, lemon juice, garlic, salt, pepper, parsley",
+        ingredients: ["Greek yogurt", "lemon juice", "garlic", "salt", "pepper", "parsley"],
       },
       {
         label: "Honey Mustard",
-        ingredients: "Olive oil, ACV, Dijon, honey, salt, pepper",
+        ingredients: ["Olive oil", "apple cider vinegar", "Dijon mustard", "honey", "salt", "pepper"],
       },
       {
         label: "Tahini Lemon",
-        ingredients: "Tahini, lemon, garlic, water, salt, pepper",
+        ingredients: ["Tahini", "lemon juice", "garlic", "water", "salt", "pepper"],
       },
       {
         label: "Satay Style",
-        ingredients: "Peanut butter, lime, soy/tamari, ginger, water",
+        ingredients: ["Peanut butter", "lime juice", "soy sauce or tamari", "ginger", "water"],
       },
       {
         label: "Balsamic Glow",
-        ingredients: "Olive oil, balsamic, Dijon, salt, pepper",
+        ingredients: ["Olive oil", "balsamic vinegar", "Dijon mustard", "salt", "pepper"],
       },
       {
-        label: "ACV Glow",
-        ingredients: "Olive oil, ACV, lemon, garlic, salt, pepper",
+        label: "Apple Cider Vinegar Glow",
+        ingredients: ["Olive oil", "apple cider vinegar", "lemon juice", "garlic", "salt", "pepper"],
       },
     ],
   },
@@ -213,7 +200,7 @@ const PRESETS: Preset[] = [
       colour: ["Cucumber", "Cherry tomatoes", "Red onion"],
       fats: ["Olive oil"],
       crunch: ["Sunflower seeds"],
-      dressing: ["ACV Glow"],
+      dressing: ["Apple Cider Vinegar Glow"],
     },
   },
   {
@@ -246,7 +233,7 @@ const PRESETS: Preset[] = [
       colour: ["Mango", "Cucumber", "Red pepper"],
       fats: ["Avocado"],
       crunch: ["Sesame seeds"],
-      dressing: ["ACV Glow"],
+      dressing: ["Apple Cider Vinegar Glow"],
     },
   },
   {
@@ -317,15 +304,14 @@ function GlowBowlBuilder() {
     setAdded(false);
   }, []);
 
-  function togglePick(stepKey: string, optionLabel: string, max: number) {
+  function togglePick(stepKey: string, optionLabel: string) {
     setAdded(false);
     setPicks((prev) => {
       const cur = prev[stepKey] ?? [];
       if (cur.includes(optionLabel)) {
         return { ...prev, [stepKey]: cur.filter((o) => o !== optionLabel) };
       }
-      const next = max === 1 ? [optionLabel] : [...cur, optionLabel].slice(-max);
-      return { ...prev, [stepKey]: next };
+      return { ...prev, [stepKey]: [...cur, optionLabel] };
     });
   }
 
@@ -348,7 +334,9 @@ function GlowBowlBuilder() {
       for (const label of picks[step.key] ?? []) {
         const opt = step.options.find((o) => o.label === label);
         if (opt?.ingredients) {
-          out.push({ item: `${opt.label} dressing ingredients`, category: step.category });
+          for (const ing of opt.ingredients) {
+            out.push({ item: ing, category: step.category });
+          }
         } else {
           out.push({ item: label, category: step.category });
         }
@@ -367,7 +355,8 @@ function GlowBowlBuilder() {
 
   function getDressingIngredients(label: string): string | undefined {
     const step = STEPS.find((s) => s.key === "dressing");
-    return step?.options.find((o) => o.label === label)?.ingredients;
+    const opt = step?.options.find((o) => o.label === label);
+    return opt?.ingredients?.join(", ");
   }
 
   return (
@@ -382,9 +371,9 @@ function GlowBowlBuilder() {
           </h1>
           <p className="mt-4 max-w-2xl text-foreground/75">
             The easiest way to build a collagen-supporting lunch without
-            overthinking it. Choose one base, one protein, two or three
-            colourful plants, one healthy fat, one crunch and a dressing. Mix
-            and match depending on what you have in the fridge.
+            overthinking it. Pick your base, protein, colours, fat, crunch and
+            a dressing — mix and match with whatever you have in the fridge.
+            There are no wrong answers.
           </p>
         </div>
       </section>
@@ -392,9 +381,9 @@ function GlowBowlBuilder() {
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[1fr_320px]">
         <div className="space-y-10">
           <section>
-            <h2 className="font-serif text-xl">Or start from a preset</h2>
+            <h2 className="font-serif text-xl">Start from a preset</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Tap to pre-fill the bowl, then tweak.
+              Tap to pre-fill the bowl, then tweak to your taste.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {PRESETS.map((p) => (
@@ -422,7 +411,7 @@ function GlowBowlBuilder() {
                     return (
                       <div key={opt.label} className="flex flex-col gap-0.5">
                         <button
-                          onClick={() => togglePick(step.key, opt.label, step.max)}
+                          onClick={() => togglePick(step.key, opt.label)}
                           className={cn(
                             "rounded-full border px-3.5 py-1.5 text-sm transition-all",
                             active
@@ -435,7 +424,7 @@ function GlowBowlBuilder() {
                         </button>
                         {opt.ingredients && (
                           <p className="px-3.5 text-[11px] text-muted-foreground">
-                            {opt.ingredients}
+                            {opt.ingredients.join(", ")}
                           </p>
                         )}
                       </div>
@@ -481,7 +470,7 @@ function GlowBowlBuilder() {
                             <div className="flex items-start justify-between gap-2 text-sm">
                               <span>{label}</span>
                               <button
-                                onClick={() => togglePick(s.key, label, s.max)}
+                                onClick={() => togglePick(s.key, label)}
                                 className="text-muted-foreground hover:text-foreground"
                                 aria-label="Remove"
                               >
