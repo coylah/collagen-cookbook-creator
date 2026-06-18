@@ -47,7 +47,6 @@ function Cookbook() {
   const [meal, setMeal] = useState<string>("all");
   const [tag, setTag] = useState<string>("all");
   const [maxTime, setMaxTime] = useState<number>(0);
-  const [boostOnly, setBoostOnly] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
 
   const mealTypes = useMemo(
@@ -63,6 +62,9 @@ function Cookbook() {
     const counts = new Map<string, number>();
     for (const r of recipes) {
       for (const t of r.tags) {
+        // Skip generic collagen tags — every recipe is collagen-supporting
+        if (["collagen-rich", "collagen-supporting", "collagen"].includes(t.toLowerCase()))
+          continue;
         counts.set(t, (counts.get(t) ?? 0) + 1);
       }
     }
@@ -79,7 +81,6 @@ function Cookbook() {
       .filter((r) => {
         if (meal !== "all" && r.meal_type !== meal) return false;
         if (tag !== "all" && !r.tags.includes(tag)) return false;
-        if (boostOnly && !r.collagen_boost) return false;
         if (maxTime > 0 && r.prep_min + r.cook_min > maxTime) return false;
         if (q) {
           const hay =
@@ -100,7 +101,7 @@ function Cookbook() {
         if (oa !== ob) return oa - ob;
         return a.name.localeCompare(b.name);
       });
-  }, [recipes, search, meal, tag, maxTime, boostOnly]);
+  }, [recipes, search, meal, tag, maxTime]);
 
   const grouped = useMemo(() => {
     const g: Record<string, typeof filtered> = {};
@@ -113,10 +114,7 @@ function Cookbook() {
       <AppShell>
         <section className="border-b border-border/50">
           <div className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
-            <p className="font-serif text-[11px] uppercase tracking-[0.28em] text-secondary">
-              Beauty starts in the kitchen
-            </p>
-            <h1 className="mt-4 font-serif text-5xl leading-[1.05] sm:text-6xl">
+            <h1 className="font-serif text-5xl leading-[1.05] sm:text-6xl">
               The Collagen Kitchen
             </h1>
           </div>
@@ -136,14 +134,11 @@ function Cookbook() {
     <AppShell>
       {/* Hero */}
       <section className="border-b border-border/50">
-        <div className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
-          <p className="font-serif text-[11px] uppercase tracking-[0.28em] text-secondary">
-            Beauty starts in the kitchen
-          </p>
-          <h1 className="mt-4 font-serif text-5xl leading-[1.05] sm:text-6xl">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:py-16">
+          <h1 className="font-serif text-5xl leading-[1.05] sm:text-6xl">
             The Collagen Kitchen
           </h1>
-          <p className="mt-5 max-w-2xl text-base text-foreground/75 sm:text-lg">
+          <p className="mt-4 max-w-2xl text-base text-foreground/70 sm:text-lg">
             Skin-food recipes to help you age slow &amp; reclaim your glow.
           </p>
           <button
@@ -155,32 +150,48 @@ function Cookbook() {
           </button>
 
           {showGuide && (
-            <div className="mt-5 max-w-2xl rounded-2xl border border-border/60 bg-card p-6">
-              <p className="font-serif text-lg">Getting started</p>
+            <div className="mt-5 max-w-2xl rounded-2xl border border-border bg-card p-6">
+              <p className="font-serif text-lg">Getting the best from this cookbook</p>
               <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
                 <li className="flex gap-3">
                   <span className="mt-0.5 text-secondary">✦</span>
-                  <span><strong className="text-foreground">Cookbook</strong> — browse all recipes by meal type, tag, time or filter by Super Boost.</span>
+                  <span>
+                    <strong className="text-foreground">Cookbook</strong> — browse
+                    all recipes by meal type, tag or cooking time. Every recipe is
+                    built around ingredients that support collagen and skin health.
+                  </span>
                 </li>
                 <li className="flex gap-3">
                   <span className="mt-0.5 text-secondary">✦</span>
-                  <span><strong className="text-foreground">Build a Glow Bowl</strong> — mix and match a collagen-supporting lunch from what you have in the fridge.</span>
+                  <span>
+                    <strong className="text-foreground">Build a Glow Bowl</strong> — 
+                    mix and match a collagen-supporting lunch from whatever you have
+                    in the fridge. Pick a base, protein, colour, fat, crunch and dressing.
+                  </span>
                 </li>
                 <li className="flex gap-3">
                   <span className="mt-0.5 text-secondary">✦</span>
-                  <span><strong className="text-foreground">Saved</strong> — tap the heart on any recipe to save it for later.</span>
+                  <span>
+                    <strong className="text-foreground">Saved</strong> — tap the
+                    heart on any recipe to save it. Find your saved recipes here
+                    any time.
+                  </span>
                 </li>
                 <li className="flex gap-3">
                   <span className="mt-0.5 text-secondary">✦</span>
-                  <span><strong className="text-foreground">Planner</strong> — add recipes to build your week, set how many you're cooking for.</span>
+                  <span>
+                    <strong className="text-foreground">Planner</strong> — add
+                    recipes to build your week. Set how many you're cooking for
+                    and the shopping list updates automatically.
+                  </span>
                 </li>
                 <li className="flex gap-3">
                   <span className="mt-0.5 text-secondary">✦</span>
-                  <span><strong className="text-foreground">Shopping</strong> — your ingredients pulled together automatically from your plan, grouped and ready to shop.</span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="mt-0.5 text-secondary">✦</span>
-                  <span><strong className="text-foreground">Super Boost</strong> — recipes especially strong for collagen-supporting protein, vitamin C, zinc or healthy fats.</span>
+                  <span>
+                    <strong className="text-foreground">Shopping list</strong> — 
+                    your ingredients pulled together from your plan, grouped by
+                    category and ready to shop. Tick things off as you go.
+                  </span>
                 </li>
               </ul>
             </div>
@@ -189,7 +200,7 @@ function Cookbook() {
       </section>
 
       {/* Filters */}
-      <section className="sticky top-[63px] z-30 border-b border-border/60 bg-background/90 backdrop-blur">
+      <section className="sticky top-[63px] z-30 border-b border-border/60 bg-background/95 backdrop-blur">
         <div className="mx-auto max-w-6xl space-y-3 px-4 py-4">
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
@@ -203,7 +214,7 @@ function Cookbook() {
             </div>
             <Link
               to="/build/glow-bowl"
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-secondary/40 bg-secondary/10 px-3.5 py-2 text-xs text-secondary transition-colors hover:bg-secondary/20"
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-secondary/50 bg-secondary/10 px-3.5 py-2 text-xs font-medium text-secondary transition-colors hover:bg-secondary/20"
             >
               <Salad className="h-3.5 w-3.5" />
               Build a Glow Bowl
@@ -225,18 +236,6 @@ function Cookbook() {
               />
             ))}
             <span className="mx-1 h-5 w-px bg-border" />
-            <Button
-              variant={boostOnly ? "default" : "outline"}
-              size="sm"
-              onClick={() => setBoostOnly((v) => !v)}
-              className={
-                boostOnly
-                  ? "bg-secondary text-secondary-foreground hover:bg-secondary/90"
-                  : ""
-              }
-            >
-              <Sparkles className="h-3.5 w-3.5" /> Super Boost
-            </Button>
             {tags.length > 0 && (
               <select
                 value={tag}
@@ -316,8 +315,8 @@ function FilterChip({
       className={
         "rounded-full border px-3 py-1 text-xs capitalize transition-colors " +
         (active
-          ? "border-foreground bg-foreground text-background"
-          : "border-input bg-background text-foreground/70 hover:bg-accent")
+          ? "border-secondary bg-secondary text-secondary-foreground"
+          : "border-border bg-background text-foreground/70 hover:border-secondary/50 hover:bg-accent")
       }
     >
       {label}
