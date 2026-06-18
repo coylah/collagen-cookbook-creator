@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Search, Sparkles, Filter, Salad, BookOpen } from "lucide-react";
+import { Search, Sparkles, Filter, Salad, BookOpen, Info } from "lucide-react";
 import { listRecipes } from "@/lib/recipes.functions";
 import { AppShell } from "@/components/app-shell";
 import { RecipeCard } from "@/components/recipe-card";
@@ -48,6 +48,7 @@ function Cookbook() {
   const [tag, setTag] = useState<string>("all");
   const [maxTime, setMaxTime] = useState<number>(0);
   const [boostOnly, setBoostOnly] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
   const mealTypes = useMemo(
     () =>
@@ -133,6 +134,7 @@ function Cookbook() {
 
   return (
     <AppShell>
+      {/* Hero */}
       <section className="border-b border-border/50">
         <div className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
           <p className="font-serif text-[11px] uppercase tracking-[0.28em] text-secondary">
@@ -144,9 +146,49 @@ function Cookbook() {
           <p className="mt-5 max-w-2xl text-base text-foreground/75 sm:text-lg">
             Skin-food recipes to help you age slow &amp; reclaim your glow.
           </p>
+          <button
+            onClick={() => setShowGuide((v) => !v)}
+            className="mt-4 inline-flex items-center gap-1.5 text-sm text-secondary underline underline-offset-2 hover:opacity-80"
+          >
+            <Info className="h-3.5 w-3.5" />
+            {showGuide ? "Hide guide" : "How to use this cookbook"}
+          </button>
+
+          {showGuide && (
+            <div className="mt-5 max-w-2xl rounded-2xl border border-border/60 bg-card p-6">
+              <p className="font-serif text-lg">Getting started</p>
+              <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+                <li className="flex gap-3">
+                  <span className="mt-0.5 text-secondary">✦</span>
+                  <span><strong className="text-foreground">Cookbook</strong> — browse all recipes by meal type, tag, time or filter by Super Boost.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-0.5 text-secondary">✦</span>
+                  <span><strong className="text-foreground">Build a Glow Bowl</strong> — mix and match a collagen-supporting lunch from what you have in the fridge.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-0.5 text-secondary">✦</span>
+                  <span><strong className="text-foreground">Saved</strong> — tap the heart on any recipe to save it for later.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-0.5 text-secondary">✦</span>
+                  <span><strong className="text-foreground">Planner</strong> — add recipes to build your week, set how many you're cooking for.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-0.5 text-secondary">✦</span>
+                  <span><strong className="text-foreground">Shopping</strong> — your ingredients pulled together automatically from your plan, grouped and ready to shop.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-0.5 text-secondary">✦</span>
+                  <span><strong className="text-foreground">Super Boost</strong> — recipes especially strong for collagen-supporting protein, vitamin C, zinc or healthy fats.</span>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       </section>
 
+      {/* Filters */}
       <section className="sticky top-[63px] z-30 border-b border-border/60 bg-background/90 backdrop-blur">
         <div className="mx-auto max-w-6xl space-y-3 px-4 py-4">
           <div className="flex items-center gap-3">
@@ -227,6 +269,7 @@ function Cookbook() {
         </div>
       </section>
 
+      {/* Recipe grid */}
       <section className="mx-auto max-w-6xl px-4 py-10">
         {filtered.length === 0 ? (
           <p className="py-16 text-center text-muted-foreground">
