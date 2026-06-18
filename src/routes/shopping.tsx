@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Printer, ShoppingBasket, RotateCcw, Check, X } from "lucide-react";
+import { Printer, ShoppingBasket, RotateCcw, Check, X, Trash2 } from "lucide-react";
 import { listRecipes } from "@/lib/recipes.functions";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
@@ -85,7 +85,6 @@ function ShoppingPage() {
 
   const fullList = useMemo(() => buildShoppingList(entries), [entries]);
 
-  // Split into active vs "already have"
   const active = fullList.filter((i) => !isHad(i.key));
   const had = fullList.filter((i) => isHad(i.key));
 
@@ -95,7 +94,6 @@ function ShoppingPage() {
       const c = item.category || "other";
       (g[c] ??= []).push(item);
     }
-    // Order categories
     return CATEGORY_ORDER.filter((c) => g[c]).map((c) => [c, g[c]] as const);
   }, [active]);
 
@@ -106,6 +104,12 @@ function ShoppingPage() {
   }, [extras]);
 
   const hasContent = entries.length > 0 || extras.length > 0;
+
+  function clearAll() {
+    clearExtras();
+    reset();
+    setBought({});
+  }
 
   return (
     <AppShell>
@@ -125,6 +129,14 @@ function ShoppingPage() {
                   <RotateCcw className="h-4 w-4" /> Reset "I have"
                 </Button>
               )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearAll}
+                className="text-muted-foreground hover:text-destructive"
+              >
+                <Trash2 className="h-4 w-4" /> Clear list
+              </Button>
               <Button variant="outline" size="sm" onClick={() => window.print()}>
                 <Printer className="h-4 w-4" /> Print
               </Button>
