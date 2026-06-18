@@ -1,6 +1,5 @@
 import type { Ingredient, Recipe } from "./recipe-types";
 
-// Parse "1", "1/2", "1.5", "7-8" into a number (use lower bound for ranges).
 export function parseQty(qty: string): number | null {
   if (!qty) return null;
   const s = qty.trim();
@@ -57,11 +56,37 @@ export type ShoppingItem = {
   key: string;
 };
 
-function normItem(s: string) {
-  return s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+// Normalise item names so similar ingredients merge
+// e.g. "chicken breast" and "chicken thighs" both become "chicken"
+// e.g. "greek yoghurt" and "greek yogurt" merge
+const ITEM_ALIASES: Record<string, string> = {
+  "chicken breast": "chicken",
+  "chicken breasts": "chicken",
+  "chicken thighs": "chicken",
+  "chicken thigh": "chicken",
+  "chicken fillets": "chicken",
+  "chicken fillet": "chicken",
+  "roast chicken thighs": "chicken",
+  "grilled chicken": "chicken",
+  "greek yogurt": "greek yoghurt",
+  "full fat greek yogurt": "greek yoghurt",
+  "full-fat greek yoghurt": "greek yoghurt",
+  "natural yoghurt": "greek yoghurt",
+  "salmon fillet": "salmon",
+  "salmon fillets": "salmon",
+  "beef mince": "beef mince",
+  "lean beef mince": "beef mince",
+  "spring onions": "spring onion",
+  "cherry tomatoes": "cherry tomatoes",
+  "olive oil": "olive oil",
+  "extra virgin olive oil": "olive oil",
+};
+
+function normItem(s: string): string {
+  const lower = s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+  return ITEM_ALIASES[lower] ?? lower;
 }
 
-// Normalise unit aliases so "grams" and "g" aggregate into the same list entry
 const UNIT_ALIASES: Record<string, string> = {
   grams: "g",
   gram: "g",
@@ -84,6 +109,7 @@ const UNIT_ALIASES: Record<string, string> = {
   pounds: "lb",
   pound: "lb",
   pinches: "pinch",
+  pinches: "pinch",
   handfuls: "handful",
   cups: "cup",
 };
@@ -93,12 +119,16 @@ function normUnit(u: string): string {
   return UNIT_ALIASES[lower] ?? lower;
 }
 
+// Staple categories — show on list but no qty needed
 const STAPLE_CATEGORIES = new Set(["cupboard", "pantry", "herbs", "spices", "fats"]);
+
+// Very small units — show as staple (just "have in cupboard")
 const STAPLE_UNITS = new Set([
   "tsp", "tbsp", "teaspoon", "tablespoon",
   "pinch", "pinches", "dash", "splash", "drizzle",
   "handful", "handfuls",
 ]);
+
 const PRODUCE_CATEGORIES = new Set(["produce"]);
 
 function isStaple(ing: { category: string; unit: string }): boolean {
@@ -108,15 +138,25 @@ function isStaple(ing: { category: string; unit: string }): boolean {
 }
 
 export function shoppingItemKey(item: string, unit: string, staple: boolean) {
+  // Staples group by name only — don't split by unit
   return staple
     ? `staple|${normItem(item)}`
     : `${normItem(item)}|${normUnit(unit)}`;
+}
+
+// Get a clean display name for the shopping list
+// Removes "half a", "small", "large" etc — shopping list friendly
+function shoppingDisplayName(item: string): string {
+  const normed = normItem(item);
+  // Capitalise first letter
+  return normed.charAt(0).toUpperCase() + normed.slice(1);
 }
 
 export function buildShoppingList(
   entries: { recipe: Recipe; servings: number }[],
 ): ShoppingItem[] {
   const map = new Map<string, ShoppingItem>();
+
   for (const { recipe, servings } of entries) {
     const factor = servings / recipe.servings;
     for (const ing of recipe.ingredients) {
@@ -125,7 +165,9 @@ export function buildShoppingList(
       const n = parseQty(ing.qty);
       const scaled = n != null ? n * factor : null;
       const existing = map.get(key);
+
       if (existing) {
+        // Merge quantities
         if (!staple && existing.qty != null && scaled != null) {
           existing.qty += scaled;
         }
@@ -133,7 +175,7 @@ export function buildShoppingList(
           existing.fromRecipes.push(recipe.name);
       } else {
         map.set(key, {
-          item: ing.item,
+          item: shoppingDisplayName(ing.item),
           unit: normUnit(ing.unit),
           qty: scaled,
           qtyText: "",
@@ -146,7 +188,9 @@ export function buildShoppingList(
     }
   }
 
+  // Format display quantities
   for (const item of map.values()) {
+    // Staples — no qty shown, just the item name
     if (item.staple) {
       item.qtyText = "";
       continue;
@@ -155,6 +199,7 @@ export function buildShoppingList(
       item.qtyText = "";
       continue;
     }
+    // Produce with no unit — round up to whole items
     if (PRODUCE_CATEGORIES.has(item.category.toLowerCase()) && !item.unit) {
       item.qty = Math.ceil(item.qty);
       item.qtyText = String(item.qty);
