@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Sparkles, Heart } from "lucide-react";
+import { Sparkles, Heart, Clock } from "lucide-react";
 import type { Recipe } from "@/lib/recipe-types";
 import { useFavourites } from "@/lib/user-state";
 import { cn } from "@/lib/utils";
@@ -104,8 +104,6 @@ function StampIllustration({ mealType }: { mealType: string }) {
   return <DinnerIllo />;
 }
 
-// ─── RecipePlaceholder (kept for recipe detail page hero) ─────────────────────
-
 export function RecipePlaceholder({
   mealType,
   className,
@@ -120,8 +118,6 @@ export function RecipePlaceholder({
   );
 }
 
-// ─── Recipe card ──────────────────────────────────────────────────────────────
-
 export function RecipeCard({ recipe }: { recipe: Recipe }) {
   const { isFav, toggle } = useFavourites();
   const fav = isFav(recipe.slug);
@@ -131,32 +127,31 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
     <Link
       to="/recipes/$slug"
       params={{ slug: recipe.slug }}
-      className="group block overflow-hidden rounded-2xl border border-border/70 bg-card transition-all hover:-translate-y-0.5 hover:shadow-sm"
+      className="group block overflow-hidden rounded-2xl border border-border bg-card transition-all hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="flex min-h-[180px] flex-col justify-between p-5">
 
-        {/* Top row — boost badge + heart */}
+        {/* Top row */}
         <div className="flex items-start justify-between gap-2">
           <div>
-            {recipe.collagen_boost && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-[9px] text-secondary-foreground">
-                <Sparkles className="h-2.5 w-2.5" /> Super Boost
-              </span>
-            )}
+            {/* Super Boost badge removed — every recipe is collagen-supporting */}
           </div>
           <button
             type="button"
             onClick={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               toggle(recipe.slug);
             }}
-            className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-border/60 bg-background transition-colors hover:bg-accent"
-            aria-label={fav ? "Remove from favourites" : "Save recipe"}
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border bg-background transition-colors hover:bg-accent"
+            aria-label={fav ? "Remove from saved" : "Save recipe"}
           >
             <Heart
               className={cn(
-                "h-3.5 w-3.5 transition-colors",
-                fav ? "fill-secondary text-secondary" : "text-foreground/30",
+                "h-4 w-4 transition-colors",
+                fav
+                  ? "fill-secondary text-secondary"
+                  : "text-foreground/30 group-hover:text-foreground/50",
               )}
             />
           </button>
@@ -164,7 +159,7 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
 
         {/* Recipe name + tease */}
         <div className="mt-3">
-          <p className="text-[9px] uppercase tracking-[0.2em] text-secondary">
+          <p className="text-[9px] uppercase tracking-[0.2em] text-secondary font-medium">
             {recipe.meal_type}
           </p>
           <h3 className="mt-1 font-serif text-[19px] leading-tight text-foreground">
@@ -177,19 +172,16 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
           )}
         </div>
 
-        {/* Footer — time + illustration stamp */}
+        {/* Footer */}
         <div className="mt-4 flex items-end justify-between">
           <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-            </svg>
+            <Clock className="h-3 w-3" />
             {total} min · Serves {recipe.servings}
           </div>
-          <div className="opacity-75">
+          <div className="opacity-60">
             <StampIllustration mealType={recipe.meal_type} />
           </div>
         </div>
-
       </div>
     </Link>
   );
