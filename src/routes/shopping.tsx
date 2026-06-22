@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { Printer, ShoppingBasket, RotateCcw, Check, X, Trash2 } from "lucide-react";
+import { useMemo, useState, useRef } from "react";
+import { Printer, ShoppingBasket, RotateCcw, Check, X, Trash2, Plus } from "lucide-react";
 import { listRecipes } from "@/lib/recipes.functions";
 import { AppShell } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
-import { useMealPlan, useHaveList, useShoppingExtras, type ExtraItem } from "@/lib/user-state";
+import { useMealPlan, useHaveList, useShoppingExtras, useManualItems, type ExtraItem } from "@/lib/user-state";
 import { buildShoppingList, type ShoppingItem } from "@/lib/recipe-math";
 import { cn } from "@/lib/utils";
 
@@ -18,10 +18,7 @@ export const Route = createFileRoute("/shopping")({
   head: () => ({
     meta: [
       { title: "Shopping list — The Collagen Kitchen" },
-      {
-        name: "description",
-        content: "Your ingredients, grouped and ready to shop.",
-      },
+      { name: "description", content: "Your ingredients, grouped and ready to shop." },
     ],
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(recipesQuery),
@@ -31,14 +28,8 @@ export const Route = createFileRoute("/shopping")({
       <p className="mx-auto max-w-6xl p-8 text-destructive">{error.message}</p>
     </AppShell>
   ),
-  notFoundComponent: () => (
-    <AppShell>
-      <p className="mx-auto max-w-6xl p-8">Nothing here yet.</p>
-    </AppShell>
-  ),
 });
 
-// Merge duplicate category labels into one clean set
 const CATEGORY_LABEL: Record<string, string> = {
   produce: "Fruit & veg",
   protein: "Protein",
@@ -53,19 +44,9 @@ const CATEGORY_LABEL: Record<string, string> = {
   other: "Other",
 };
 
-// Deduplicated display order — cupboard staples merged under one heading
 const CATEGORY_ORDER = [
-  "produce",
-  "protein",
-  "dairy",
-  "grains",
-  "cupboard",
-  "pantry",
-  "fats",
-  "spices",
-  "herbs",
-  "nuts_seeds",
-  "other",
+  "produce", "protein", "dairy", "grains",
+  "cupboard", "pantry", "fats", "spices", "herbs", "nuts_seeds", "other",
 ];
 
 function ShoppingPage() {
@@ -74,7 +55,10 @@ function ShoppingPage() {
   const { plan } = useMealPlan();
   const { isHad, toggle: toggleHave, reset } = useHaveList();
   const { extras, remove: removeExtra, clear: clearExtras } = useShoppingExtras();
+  const { items: manualItems, addItem, toggleItem, removeItem, clearAll: clearManual } = useManualItems();
   const [bought, setBought] = useState<Record<string, boolean>>({});
+  const [manualInput, setManualInput] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const entries = useMemo(() => {
     return Object.values(plan)
@@ -87,36 +71,26 @@ function ShoppingPage() {
   }, [plan, bySlug, recipes]);
 
   const fullList = useMemo(() => buildShoppingList(entries), [entries]);
-
   const active = fullList.filter((i) => !isHad(i.key));
   const had = fullList.filter((i) => isHad(i.key));
 
-  // Merge duplicate categories into single groups
   const grouped = useMemo(() => {
     const g: Record<string, ShoppingItem[]> = {};
     for (const item of active) {
       const rawCat = item.category || "other";
-      // Map all cupboard-type categories to one key
-      const mergedCat =
-        ["pantry", "spices", "herbs", "fats", "nuts_seeds"].includes(rawCat)
-          ? "cupboard"
-          : rawCat;
+      const mergedCat = ["pantry", "spices", "herbs", "fats", "nuts_seeds"].includes(rawCat)
+        ? "cupboard" : rawCat;
       (g[mergedCat] ??= []).push(item);
     }
-    // Return in order, deduped
     const seen = new Set<string>();
     return CATEGORY_ORDER.filter((c) => {
-      const mergedCat = ["pantry", "spices", "herbs", "fats", "nuts_seeds"].includes(c)
-        ? "cupboard"
-        : c;
-      if (seen.has(mergedCat)) return false;
-      seen.add(mergedCat);
-      return !!g[mergedCat];
+      const mc = ["pantry", "spices", "herbs", "fats", "nuts_seeds"].includes(c) ? "cupboard" : c;
+      if (seen.has(mc)) return false;
+      seen.add(mc);
+      return !!g[mc];
     }).map((c) => {
-      const mergedCat = ["pantry", "spices", "herbs", "fats", "nuts_seeds"].includes(c)
-        ? "cupboard"
-        : c;
-      return [mergedCat, g[mergedCat]] as const;
+      const mc = ["pantry", "spices", "herbs", "fats", "nuts_seeds"].includes(c) ? "cupboard" : c;
+      return [mc, g[mc]] as const;
     });
   }, [active]);
 
@@ -126,15 +100,23 @@ function ShoppingPage() {
     return g;
   }, [extras]);
 
-  const hasContent = entries.length > 0 || extras.length > 0;
+  const hasContent = entries.length > 0 || extras.length > 0 || manualItems.length > 0;
 
   function clearAll() {
     clearExtras();
     reset();
+    clearManual();
     setBought({});
   }
 
-  // Warm, clear subtitle
+  function handleAddManual(e: React.FormEvent) {
+    e.preventDefault();
+    if (!manualInput.trim()) return;
+    addItem(manualInput);
+    setManualInput("");
+    inputRef.current?.focus();
+  }
+
   const subtitle = hasContent
     ? entries.length > 0 && extras.length > 0
       ? "Your shopping list from your meal plan and Glow Bowl extras."
@@ -183,37 +165,29 @@ function ShoppingPage() {
               Add recipes to your planner or build a Glow Bowl to get started.
             </p>
             <div className="mt-4 flex justify-center gap-3">
-              <Link
-                to="/planner"
-                className="text-sm font-medium text-secondary underline underline-offset-2"
-              >
+              <Link to="/planner" className="text-sm text-secondary underline underline-offset-2">
                 Plan your week
               </Link>
               <span className="text-muted-foreground">·</span>
-              <Link
-                to="/build/glow-bowl"
-                className="text-sm font-medium text-secondary underline underline-offset-2"
-              >
+              <Link to="/build/glow-bowl" className="text-sm text-secondary underline underline-offset-2">
                 Build a Glow Bowl
               </Link>
             </div>
           </div>
         ) : (
           <div className="mt-8 space-y-6">
+
+            {/* Recipe items grouped by category */}
             {grouped.map(([cat, items]) => (
               <div key={cat} className="rounded-2xl border bg-card p-5">
-                <h2 className="font-serif text-lg">
-                  {CATEGORY_LABEL[cat] ?? cat}
-                </h2>
+                <h2 className="font-serif text-lg">{CATEGORY_LABEL[cat] ?? cat}</h2>
                 <ul className="mt-3 divide-y divide-border/60">
                   {items.map((item) => (
                     <ShoppingRow
                       key={item.key}
                       item={item}
                       checked={!!bought[item.key]}
-                      onCheck={() =>
-                        setBought((b) => ({ ...b, [item.key]: !b[item.key] }))
-                      }
+                      onCheck={() => setBought((b) => ({ ...b, [item.key]: !b[item.key] }))}
                       onHave={() => toggleHave(item.key)}
                     />
                   ))}
@@ -221,6 +195,7 @@ function ShoppingPage() {
               </div>
             ))}
 
+            {/* Glow Bowl extras */}
             {extras.length > 0 && (
               <div className="rounded-2xl border border-secondary/30 bg-card p-5">
                 <div className="flex items-center justify-between">
@@ -239,15 +214,11 @@ function ShoppingPage() {
                     </p>
                     <ul className="mt-1 divide-y divide-border/60">
                       {items.map((e) => (
-                        <li
-                          key={e.item}
-                          className="flex items-center justify-between py-2 text-sm"
-                        >
+                        <li key={e.item} className="flex items-center justify-between py-2 text-sm">
                           <span>{e.item}</span>
                           <button
                             onClick={() => removeExtra(e.item)}
-                            className="grid h-6 w-6 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
-                            aria-label="Remove"
+                            className="grid h-6 w-6 place-items-center rounded-full text-muted-foreground hover:bg-muted"
                           >
                             <X className="h-3.5 w-3.5" />
                           </button>
@@ -259,6 +230,7 @@ function ShoppingPage() {
               </div>
             )}
 
+            {/* Already in cupboard */}
             {had.length > 0 && (
               <details className="rounded-2xl border bg-muted/30 p-5">
                 <summary className="cursor-pointer font-serif text-base">
@@ -266,25 +238,13 @@ function ShoppingPage() {
                 </summary>
                 <ul className="mt-3 divide-y divide-border/40">
                   {had.map((item) => (
-                    <li
-                      key={item.key}
-                      className="flex items-center justify-between py-2 text-sm text-muted-foreground"
-                    >
+                    <li key={item.key} className="flex items-center justify-between py-2 text-sm text-muted-foreground">
                       <span>
-                        {item.qtyText && (
-                          <strong className="text-foreground/70">
-                            {item.qtyText}{" "}
-                          </strong>
-                        )}
-                        {item.unit && !item.staple && (
-                          <span>{item.unit} </span>
-                        )}
+                        {item.qtyText && <strong className="text-foreground/70">{item.qtyText} </strong>}
+                        {item.unit && !item.staple && <span>{item.unit} </span>}
                         {item.item}
                       </span>
-                      <button
-                        onClick={() => toggleHave(item.key)}
-                        className="text-xs text-secondary hover:underline"
-                      >
+                      <button onClick={() => toggleHave(item.key)} className="text-xs text-secondary hover:underline">
                         Bring back
                       </button>
                     </li>
@@ -292,6 +252,60 @@ function ShoppingPage() {
                 </ul>
               </details>
             )}
+
+            {/* Manual items */}
+            <div className="rounded-2xl border bg-card p-5">
+              <h2 className="font-serif text-lg mb-4">Add anything else</h2>
+              <form onSubmit={handleAddManual} className="flex gap-2 mb-4">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={manualInput}
+                  onChange={(e) => setManualInput(e.target.value)}
+                  placeholder="e.g. coffee, washing up liquid, milk…"
+                  className="flex-1 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus:border-secondary"
+                />
+                <button
+                  type="submit"
+                  disabled={!manualInput.trim()}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground disabled:opacity-40 hover:bg-secondary/90"
+                >
+                  <Plus className="h-4 w-4" /> Add
+                </button>
+              </form>
+              {manualItems.length > 0 && (
+                <ul className="divide-y divide-border/60">
+                  {manualItems.map((item) => (
+                    <li key={item.addedAt} className="flex items-center gap-3 py-2.5">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 accent-secondary"
+                        checked={item.checked}
+                        onChange={() => toggleItem(item.addedAt)}
+                      />
+                      <span className={cn(
+                        "flex-1 text-sm",
+                        item.checked && "text-muted-foreground line-through"
+                      )}>
+                        {item.text}
+                      </span>
+                      <button
+                        onClick={() => removeItem(item.addedAt)}
+                        className="grid h-6 w-6 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {manualItems.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  Add coffee, toiletries, school snacks — anything else you need this week.
+                </p>
+              )}
+            </div>
+
           </div>
         )}
       </section>
@@ -321,7 +335,7 @@ function ShoppingRow({
       <div className="flex-1">
         <p className={cn("text-sm", checked && "text-muted-foreground line-through")}>
           {item.qtyText && <strong>{item.qtyText} </strong>}
-          {item.unit && !item.staple && <span>{item.unit} </span>}
+          {item.unit && !item.staple && <span className="text-muted-foreground">{item.unit} </span>}
           {item.item}
         </p>
         <p className="text-[11px] text-muted-foreground">
@@ -331,7 +345,6 @@ function ShoppingRow({
       <button
         onClick={onHave}
         className="no-print inline-flex shrink-0 items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] text-muted-foreground transition-colors hover:border-secondary hover:text-secondary"
-        title="I already have this"
       >
         <Check className="h-3 w-3" /> I have
       </button>
