@@ -1,12 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Search, Sparkles, Filter, Salad, BookOpen, Info } from "lucide-react";
+import { Search, Filter, Salad, BookOpen, Info } from "lucide-react";
 import { listRecipes } from "@/lib/recipes.functions";
 import { AppShell } from "@/components/app-shell";
 import { RecipeCard } from "@/components/recipe-card";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
 const recipesQuery = queryOptions({
   queryKey: ["recipes"],
@@ -19,8 +18,7 @@ export const Route = createFileRoute("/")(({
       { title: "The Collagen Kitchen — Love Coylah" },
       {
         name: "description",
-        content:
-          "Skin-food recipes to help you age slow and reclaim your glow.",
+        content: "Skin-food recipes to help you age slow and reclaim your glow.",
       },
     ],
   }),
@@ -52,8 +50,7 @@ function Cookbook() {
   const mealTypes = useMemo(
     () =>
       Array.from(new Set(recipes.map((r) => r.meal_type))).sort(
-        (a, b) =>
-          (MEAL_ORDER.indexOf(a) + 99) - (MEAL_ORDER.indexOf(b) + 99),
+        (a, b) => (MEAL_ORDER.indexOf(a) + 99) - (MEAL_ORDER.indexOf(b) + 99),
       ),
     [recipes],
   );
@@ -62,7 +59,6 @@ function Cookbook() {
     const counts = new Map<string, number>();
     for (const r of recipes) {
       for (const t of r.tags) {
-        // Skip generic collagen tags — every recipe is collagen-supporting
         if (["collagen-rich", "collagen-supporting", "collagen"].includes(t.toLowerCase()))
           continue;
         counts.set(t, (counts.get(t) ?? 0) + 1);
@@ -112,19 +108,9 @@ function Cookbook() {
   if (recipes.length === 0) {
     return (
       <AppShell>
-        <section className="border-b border-border/50">
-          <div className="mx-auto max-w-6xl px-4 py-14 sm:py-20">
-            <h1 className="font-serif text-5xl leading-[1.05] sm:text-6xl">
-              The Collagen Kitchen
-            </h1>
-          </div>
-        </section>
         <div className="mx-auto max-w-6xl px-4 py-20 text-center">
           <BookOpen className="mx-auto h-10 w-10 text-muted-foreground" />
           <p className="mt-4 font-serif text-xl">Recipes coming soon</p>
-          <p className="mt-2 text-sm text-muted-foreground">
-            The cookbook is being filled with skin-food recipes. Check back soon.
-          </p>
         </div>
       </AppShell>
     );
@@ -132,76 +118,51 @@ function Cookbook() {
 
   return (
     <AppShell>
-      {/* Hero */}
-      <section className="border-b border-border/50">
-        <div className="mx-auto max-w-6xl px-4 py-12 sm:py-16">
-          <h1 className="font-serif text-5xl leading-[1.05] sm:text-6xl">
-            The Collagen Kitchen
+      {/* Hero — dark, confident, editorial */}
+      <section className="bg-foreground text-background">
+        <div className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+          <p className="font-script text-2xl text-secondary mb-1">Love Coylah</p>
+          <h1 className="font-serif text-6xl sm:text-7xl font-light leading-[1.0] mb-6">
+            The Collagen<br/>Kitchen
           </h1>
-          <p className="mt-4 max-w-2xl text-base text-foreground/70 sm:text-lg">
-            Skin-food recipes to help you age slow &amp; reclaim your glow.
+          <p className="max-w-xl text-base text-background/70 leading-relaxed mb-8">
+            Skin-food recipes to help you age slow &amp; reclaim your glow — built around food that actually does something for your skin.
           </p>
-          <button
-            onClick={() => setShowGuide((v) => !v)}
-            className="mt-4 inline-flex items-center gap-1.5 text-sm text-secondary underline underline-offset-2 hover:opacity-80"
-          >
-            <Info className="h-3.5 w-3.5" />
-            {showGuide ? "Hide guide" : "How to use this cookbook"}
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              to="/build/glow-bowl"
+              className="inline-flex items-center gap-2 rounded-full bg-secondary px-5 py-2.5 text-sm font-medium text-secondary-foreground hover:bg-secondary/90 transition-colors"
+            >
+              <Salad className="h-4 w-4" />
+              Build a Glow Bowl
+            </Link>
+            <button
+              onClick={() => setShowGuide(v => !v)}
+              className="inline-flex items-center gap-2 rounded-full border border-background/20 px-5 py-2.5 text-sm text-background/70 hover:bg-background/10 transition-colors"
+            >
+              <Info className="h-4 w-4" />
+              {showGuide ? "Hide guide" : "How to use this cookbook"}
+            </button>
+          </div>
 
           {showGuide && (
-            <div className="mt-5 max-w-2xl rounded-2xl border border-border bg-card p-6">
-              <p className="font-serif text-lg">Getting the best from this cookbook</p>
-              <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
-                <li className="flex gap-3">
-                  <span className="mt-0.5 text-secondary">✦</span>
-                  <span>
-                    <strong className="text-foreground">Cookbook</strong> — browse
-                    all recipes by meal type, tag or cooking time. Every recipe is
-                    built around ingredients that support collagen and skin health.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="mt-0.5 text-secondary">✦</span>
-                  <span>
-                    <strong className="text-foreground">Build a Glow Bowl</strong> — 
-                    mix and match a collagen-supporting lunch from whatever you have
-                    in the fridge. Pick a base, protein, colour, fat, crunch and dressing.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="mt-0.5 text-secondary">✦</span>
-                  <span>
-                    <strong className="text-foreground">Saved</strong> — tap the
-                    heart on any recipe to save it. Find your saved recipes here
-                    any time.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="mt-0.5 text-secondary">✦</span>
-                  <span>
-                    <strong className="text-foreground">Planner</strong> — add
-                    recipes to build your week. Set how many you're cooking for
-                    and the shopping list updates automatically.
-                  </span>
-                </li>
-                <li className="flex gap-3">
-                  <span className="mt-0.5 text-secondary">✦</span>
-                  <span>
-                    <strong className="text-foreground">Shopping list</strong> — 
-                    your ingredients pulled together from your plan, grouped by
-                    category and ready to shop. Tick things off as you go.
-                  </span>
-                </li>
+            <div className="mt-6 max-w-2xl rounded-2xl border border-background/10 bg-background/5 p-6">
+              <p className="font-serif text-lg text-background mb-4">Getting the best from this cookbook</p>
+              <ul className="space-y-3 text-sm text-background/70">
+                <li className="flex gap-3"><span className="text-secondary mt-0.5">✦</span><span><strong className="text-background">Cookbook</strong> — every recipe is built around food that actively supports your skin. Browse, filter and explore.</span></li>
+                <li className="flex gap-3"><span className="text-secondary mt-0.5">✦</span><span><strong className="text-background">Save</strong> — tap the heart on any recipe to save it to your Saved tab.</span></li>
+                <li className="flex gap-3"><span className="text-secondary mt-0.5">✦</span><span><strong className="text-background">Planner</strong> — add recipes to plan your week. Your shopping list builds automatically.</span></li>
+                <li className="flex gap-3"><span className="text-secondary mt-0.5">✦</span><span><strong className="text-background">Shopping list</strong> — everything from your plan in one clean list, grouped and ready to shop.</span></li>
+                <li className="flex gap-3"><span className="text-secondary mt-0.5">✦</span><span><strong className="text-background">Glow Bowl</strong> — build a collagen-supporting lunch from whatever's in your fridge.</span></li>
               </ul>
             </div>
           )}
         </div>
       </section>
 
-      {/* Filters */}
-      <section className="sticky top-[63px] z-30 border-b border-border/60 bg-background/95 backdrop-blur">
-        <div className="mx-auto max-w-6xl space-y-3 px-4 py-4">
+      {/* Filter bar */}
+      <section className="sticky top-[63px] z-30 border-b border-border bg-background/98 backdrop-blur shadow-sm">
+        <div className="mx-auto max-w-6xl px-4 py-3 space-y-3">
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -209,51 +170,33 @@ function Cookbook() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search recipes or ingredients…"
-                className="pl-9"
+                className="pl-9 bg-muted/40 border-border"
               />
             </div>
-            <Link
-              to="/build/glow-bowl"
-              className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-secondary/50 bg-secondary/10 px-3.5 py-2 text-xs font-medium text-secondary transition-colors hover:bg-secondary/20"
-            >
-              <Salad className="h-3.5 w-3.5" />
-              Build a Glow Bowl
-            </Link>
           </div>
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <span className="text-xs text-muted-foreground">Filter by:</span>
-            <FilterChip
-              label="All"
-              active={meal === "all"}
-              onClick={() => setMeal("all")}
-            />
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Filter:</span>
+            <FilterChip label="All" active={meal === "all"} onClick={() => setMeal("all")} />
             {mealTypes.map((m) => (
-              <FilterChip
-                key={m}
-                label={m}
-                active={meal === m}
-                onClick={() => setMeal(m)}
-              />
+              <FilterChip key={m} label={m} active={meal === m} onClick={() => setMeal(m)} />
             ))}
-            <span className="mx-1 h-5 w-px bg-border" />
+            <span className="mx-1 h-4 w-px bg-border" />
             {tags.length > 0 && (
               <select
                 value={tag}
                 onChange={(e) => setTag(e.target.value)}
-                className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+                className="h-8 rounded-full border border-border bg-background px-3 text-xs text-foreground"
               >
                 <option value="all">Tag: all</option>
                 {tags.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
+                  <option key={t} value={t}>{t}</option>
                 ))}
               </select>
             )}
             <select
               value={maxTime}
               onChange={(e) => setMaxTime(Number(e.target.value))}
-              className="h-8 rounded-md border border-input bg-background px-2 text-xs"
+              className="h-8 rounded-full border border-border bg-background px-3 text-xs text-foreground"
             >
               <option value={0}>Time: any</option>
               <option value={15}>Under 15 min</option>
@@ -271,21 +214,19 @@ function Cookbook() {
       {/* Recipe grid */}
       <section className="mx-auto max-w-6xl px-4 py-10">
         {filtered.length === 0 ? (
-          <p className="py-16 text-center text-muted-foreground">
-            No recipes match those filters yet.
-          </p>
+          <p className="py-16 text-center text-muted-foreground">No recipes match those filters yet.</p>
         ) : (
-          <div className="space-y-12">
+          <div className="space-y-14">
             {Object.entries(grouped).map(([mealType, items]) => (
               <div key={mealType}>
-                <div className="mb-5 flex items-baseline gap-3">
-                  <h2 className="font-serif text-2xl capitalize">{mealType}</h2>
+                <div className="mb-6 flex items-center gap-4">
+                  <h2 className="font-serif text-3xl capitalize">{mealType}</h2>
+                  <span className="h-px flex-1 bg-border" />
                   <span className="text-xs uppercase tracking-wider text-muted-foreground">
                     {items.length} {items.length === 1 ? "recipe" : "recipes"}
                   </span>
-                  <span className="ml-2 h-px flex-1 bg-border/60" />
                 </div>
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {items.map((r) => (
                     <RecipeCard key={r.id} recipe={r} />
                   ))}
@@ -299,24 +240,16 @@ function Cookbook() {
   );
 }
 
-function FilterChip({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
+function FilterChip({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={
-        "rounded-full border px-3 py-1 text-xs capitalize transition-colors " +
+        "rounded-full border px-3.5 py-1 text-xs capitalize transition-colors font-medium " +
         (active
           ? "border-secondary bg-secondary text-secondary-foreground"
-          : "border-border bg-background text-foreground/70 hover:border-secondary/50 hover:bg-accent")
+          : "border-border bg-background text-foreground/60 hover:border-secondary/40 hover:text-foreground")
       }
     >
       {label}
