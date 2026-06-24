@@ -1,10 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { Sparkles, Heart, Clock } from "lucide-react";
+import { Heart, Clock } from "lucide-react";
 import type { Recipe } from "@/lib/recipe-types";
 import { useFavourites } from "@/lib/user-state";
 import { cn } from "@/lib/utils";
-
-// ─── Illustrations ────────────────────────────────────────────────────────────
 
 function SmoothieIllo({ size = 36 }: { size?: number }) {
   return (
@@ -104,15 +102,9 @@ function StampIllustration({ mealType }: { mealType: string }) {
   return <DinnerIllo />;
 }
 
-export function RecipePlaceholder({
-  mealType,
-  className,
-}: {
-  mealType: string;
-  className?: string;
-}) {
+export function RecipePlaceholder({ mealType, className }: { mealType: string; className?: string }) {
   return (
-    <div className={cn("flex items-center justify-center bg-[#FAFAF8]", className)}>
+    <div className={cn("flex items-center justify-center bg-muted/30", className)}>
       <StampIllustration mealType={mealType} />
     </div>
   );
@@ -127,15 +119,15 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
     <Link
       to="/recipes/$slug"
       params={{ slug: recipe.slug }}
-      className="group block overflow-hidden rounded-2xl border border-border bg-card transition-all hover:-translate-y-0.5 hover:shadow-md"
+      className="group block overflow-hidden rounded-2xl border border-border bg-card transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-secondary/30"
     >
-      <div className="flex min-h-[180px] flex-col justify-between p-5">
+      <div className="flex min-h-[200px] flex-col justify-between p-5">
 
         {/* Top row */}
         <div className="flex items-start justify-between gap-2">
-          <div>
-            {/* Super Boost badge removed — every recipe is collagen-supporting */}
-          </div>
+          <span className="inline-block rounded-full border border-secondary/30 bg-secondary/10 px-2.5 py-0.5 text-[9px] font-medium uppercase tracking-widest text-secondary">
+            {recipe.meal_type}
+          </span>
           <button
             type="button"
             onClick={(e) => {
@@ -143,42 +135,37 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
               e.stopPropagation();
               toggle(recipe.slug);
             }}
-            className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border bg-background transition-colors hover:bg-accent"
+            className={cn(
+              "grid h-8 w-8 shrink-0 place-items-center rounded-full border transition-all",
+              fav
+                ? "border-secondary bg-secondary/10 text-secondary"
+                : "border-border bg-background text-foreground/20 hover:border-secondary/40 hover:text-secondary/60"
+            )}
             aria-label={fav ? "Remove from saved" : "Save recipe"}
           >
-            <Heart
-              className={cn(
-                "h-4 w-4 transition-colors",
-                fav
-                  ? "fill-secondary text-secondary"
-                  : "text-foreground/30 group-hover:text-foreground/50",
-              )}
-            />
+            <Heart className={cn("h-4 w-4 transition-all", fav && "fill-secondary")} />
           </button>
         </div>
 
-        {/* Recipe name + tease */}
-        <div className="mt-3">
-          <p className="text-[9px] uppercase tracking-[0.2em] text-secondary font-medium">
-            {recipe.meal_type}
-          </p>
-          <h3 className="mt-1 font-serif text-[19px] leading-tight text-foreground">
+        {/* Name + tease */}
+        <div className="mt-4">
+          <h3 className="font-serif text-[21px] leading-tight text-foreground group-hover:text-secondary transition-colors">
             {recipe.name}
           </h3>
           {recipe.collagen_tip && (
-            <p className="mt-2 line-clamp-2 text-[11px] leading-relaxed text-muted-foreground">
+            <p className="mt-2 line-clamp-2 text-[12px] leading-relaxed text-muted-foreground">
               {recipe.collagen_tip}
             </p>
           )}
         </div>
 
         {/* Footer */}
-        <div className="mt-4 flex items-end justify-between">
-          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+        <div className="mt-5 flex items-end justify-between border-t border-border/60 pt-4">
+          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
             <Clock className="h-3 w-3" />
             {total} min · Serves {recipe.servings}
           </div>
-          <div className="opacity-60">
+          <div className="opacity-50 group-hover:opacity-80 transition-opacity">
             <StampIllustration mealType={recipe.meal_type} />
           </div>
         </div>
