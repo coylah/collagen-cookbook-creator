@@ -6,9 +6,7 @@ import {
   Heart,
   Minus,
   Plus,
-  Sparkles,
   CalendarPlus,
-  Lightbulb,
 } from "lucide-react";
 import { getRecipeBySlug } from "@/lib/recipes.functions";
 import { AppShell } from "@/components/app-shell";
@@ -64,7 +62,7 @@ export const Route = createFileRoute("/recipes/$slug")({
 function RecipePage() {
   const recipe = Route.useLoaderData() as import("@/lib/recipe-types").Recipe;
   const { isFav, toggle } = useFavourites();
-  const { set: setPlan, people } = useMealPlan();
+  const { set: setPlan } = useMealPlan();
   const [servings, setServings] = useState(recipe.servings);
   const [checkedIng, setCheckedIng] = useState<Record<number, boolean>>({});
   const [checkedStep, setCheckedStep] = useState<Record<number, boolean>>({});
@@ -88,14 +86,14 @@ function RecipePage() {
     recipe.tags.includes("beauty-oats-builder") ||
     recipe.slug === "overnight-beauty-oats";
 
-  // Check if glow factor is meaningfully different from the recipe name/description
-  // If collagen_tip starts the same way as the recipe name, it's likely duplicated
   const glowFactorIsDuplicate =
     recipe.collagen_tip &&
     recipe.name &&
     recipe.collagen_tip.toLowerCase().startsWith(
       recipe.name.toLowerCase().slice(0, 20),
     );
+
+  const fav = isFav(recipe.slug);
 
   return (
     <AppShell>
@@ -107,26 +105,22 @@ function RecipePage() {
           <ArrowLeft className="h-3 w-3" /> Back to cookbook
         </Link>
 
-        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-          <div className="relative px-8 py-10 sm:px-12 border-b border-border">
+        <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
 
-            {/* Illustration stamp */}
-            <div className="absolute right-8 top-8 opacity-40 no-print">
+          {/* ── Header ── */}
+          <div className="relative bg-[#FAFAF8] px-8 py-10 sm:px-12 border-b border-border">
+            <div className="absolute right-8 top-8 opacity-30 no-print">
               <RecipeStamp mealType={recipe.meal_type} />
             </div>
 
-            <p className="text-[9px] uppercase tracking-[0.22em] text-secondary">
+            <p className="text-[9px] uppercase tracking-[0.22em] text-secondary mb-2">
               {recipe.meal_type}
             </p>
-
-            <h1 className="mt-2 font-serif text-4xl font-light leading-tight text-foreground sm:text-5xl">
+            <h1 className="font-serif text-4xl font-light leading-tight text-foreground sm:text-5xl">
               {recipe.name}
             </h1>
-
-            {/* Rose rule */}
             <div className="mt-4 h-px w-7 bg-secondary" />
 
-            {/* Meta */}
             <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
               <span className="inline-flex items-center gap-1.5">
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -137,45 +131,17 @@ function RecipePage() {
                 {recipe.cook_min > 0 && ` · ${recipe.cook_min} cook)`}
               </span>
               <span>· Serves {servings}</span>
-              {recipe.collagen_boost && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-secondary/10 border border-secondary/30 px-2.5 py-1 text-[10px] text-secondary">
-                  <Sparkles className="h-2.5 w-2.5" /> Super Boost
-                </span>
-              )}
             </div>
 
-            {/* Tags */}
-            {recipe.tags.filter(t =>
-              t !== "beauty-oats-builder" &&
-              !["collagen-rich","collagen-supporting","collagen"].includes(t.toLowerCase())
-            ).length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {recipe.tags
-                  .filter(t =>
-                    t !== "beauty-oats-builder" &&
-                    !["collagen-rich","collagen-supporting","collagen"].includes(t.toLowerCase())
-                  )
-                  .map((t) => (
-                    <span
-                      key={t}
-                      className="rounded-full border border-border px-2.5 py-0.5 text-[10px] text-muted-foreground"
-                    >
-                      {t}
-                    </span>
-                  ))}
-              </div>
-            )}
-
-            {/* Actions */}
-            <div className="no-print mt-6 flex flex-wrap gap-2">
+            <div className="no-print mt-5 flex flex-wrap gap-2">
               <Button
                 size="sm"
-                variant={isFav(recipe.slug) ? "default" : "outline"}
+                variant={fav ? "default" : "outline"}
                 onClick={() => toggle(recipe.slug)}
-                className={isFav(recipe.slug) ? "bg-secondary text-secondary-foreground hover:bg-secondary/90" : ""}
+                className={fav ? "bg-secondary text-secondary-foreground hover:bg-secondary/90" : ""}
               >
-                <Heart className={cn("h-3.5 w-3.5", isFav(recipe.slug) && "fill-secondary-foreground")} />
-                {isFav(recipe.slug) ? "Saved" : "Save recipe"}
+                <Heart className={cn("h-3.5 w-3.5", fav && "fill-secondary-foreground")} />
+                {fav ? "Saved" : "Save recipe"}
               </Button>
               <Button
                 size="sm"
@@ -193,7 +159,7 @@ function RecipePage() {
             {showPlanPicker && (
               <PlanPicker
                 onPick={(day, slot) => {
-                  setPlan(day, slot, { slug: recipe.slug, servings: people });
+                  setPlan(day, slot, { slug: recipe.slug, servings });
                   setShowPlanPicker(false);
                 }}
               />
@@ -206,7 +172,19 @@ function RecipePage() {
             )}
           </div>
 
-          {/* Ingredients + Method */}
+          {/* ── Coylah's Tips — TOP ── */}
+          {recipe.notes && (
+            <div className="border-b border-border bg-[#fef2f4] px-8 py-6 sm:px-12">
+              <p className="mb-2 text-[9px] uppercase tracking-[0.22em] text-secondary font-medium">
+                Coylah's tips
+              </p>
+              <p className="text-sm font-light leading-relaxed text-foreground/80">
+                {recipe.notes}
+              </p>
+            </div>
+          )}
+
+          {/* ── Ingredients + Method ── */}
           <div className="grid gap-0 lg:grid-cols-[1fr_1.4fr]">
             <section className="border-b border-border px-8 py-8 lg:border-b-0 lg:border-r lg:px-10">
               <div className="mb-5 flex items-center justify-between">
@@ -292,30 +270,15 @@ function RecipePage() {
             </section>
           </div>
 
-          {/* Callout boxes */}
-          {(recipe.notes || (recipe.collagen_tip && !glowFactorIsDuplicate)) && (
-            <div className="space-y-2 border-t border-border px-8 py-8 lg:px-10">
-              {recipe.notes && (
-                <aside className="border-l-2 border-secondary/60 py-3 pl-4">
-                  <p className="mb-1.5 flex items-center gap-2 text-[9px] uppercase tracking-[0.18em] text-secondary">
-                    <Lightbulb className="h-3 w-3" />
-                    Coylah's tips
-                  </p>
-                  <p className="text-sm font-light leading-relaxed text-foreground/80">
-                    {recipe.notes}
-                  </p>
-                </aside>
-              )}
-              {recipe.collagen_tip && !glowFactorIsDuplicate && (
-                <aside className="border-l-2 border-secondary py-3 pl-4">
-                  <p className="mb-1.5 text-[9px] uppercase tracking-[0.18em] text-secondary">
-                    ✦ The glow factor
-                  </p>
-                  <p className="text-sm font-light leading-relaxed text-foreground/80">
-                    {recipe.collagen_tip}
-                  </p>
-                </aside>
-              )}
+          {/* ── The Glow Factor — BOTTOM ── */}
+          {recipe.collagen_tip && !glowFactorIsDuplicate && (
+            <div className="border-t border-border bg-foreground px-8 py-8 sm:px-12">
+              <p className="mb-3 text-[9px] uppercase tracking-[0.22em] text-secondary font-medium">
+                ✦ The glow factor
+              </p>
+              <p className="font-serif text-xl font-light leading-relaxed text-background/90">
+                {recipe.collagen_tip}
+              </p>
             </div>
           )}
         </div>
@@ -368,7 +331,6 @@ function RecipeStamp({ mealType }: { mealType: string }) {
       <circle cx="32" cy="46" r="1.5" fill="#C9485B" opacity="0.5"/>
     </svg>
   );
-  // Default — dinner/other (pan)
   return (
     <svg width="48" height="56" viewBox="0 0 72 76" fill="none" aria-hidden="true">
       <ellipse cx="38" cy="54" rx="24" ry="8" stroke="#1C1917" strokeWidth="0.7" fill="none"/>
