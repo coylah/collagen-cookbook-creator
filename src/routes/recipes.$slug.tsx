@@ -107,8 +107,8 @@ function RecipePage() {
 
         <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
 
-          {/* Header */}
-          <div className="relative bg-[#FAFAF8] px-8 py-10 sm:px-12 border-b border-border">
+          {/* Header — pure white */}
+          <div className="relative bg-white px-8 py-10 sm:px-12 border-b border-border">
             <div className="absolute right-8 top-8 opacity-30 no-print">
               <RecipeStamp mealType={recipe.meal_type} />
             </div>
@@ -152,12 +152,7 @@ function RecipePage() {
                 <CalendarPlus className="h-3.5 w-3.5" />
                 {showPlanPicker ? "Cancel" : "Add to meal plan"}
               </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => window.print()}
-                className="hover:text-secondary"
-              >
+              <Button size="sm" variant="ghost" onClick={() => window.print()} className="hover:text-secondary">
                 Print
               </Button>
             </div>
@@ -276,7 +271,7 @@ function RecipePage() {
             </section>
           </div>
 
-          {/* The Glow Factor — BOTTOM — now matches Coylah's Tips style */}
+          {/* Glow Factor — BOTTOM — blush pink matching Coylah's Tips */}
           {recipe.collagen_tip && !glowFactorIsDuplicate && (
             <div className="border-t border-border bg-[#fef2f4] px-8 py-8 sm:px-12">
               <p className="mb-3 text-[9px] uppercase tracking-[0.22em] text-secondary font-medium">
@@ -358,7 +353,7 @@ function PlanPicker({ onPick }: { onPick: (day: string, slot: Slot) => void }) {
       <p className="mb-3 text-xs text-muted-foreground">
         Tap a slot to add this recipe to your week:
       </p>
-      <div className="grid grid-cols-[auto_repeat(4,1fr)] gap-1 text-xs">
+      <div className="grid grid-cols-[auto_repeat(4,1fr)] gap-1 text-xs overflow-x-auto">
         <div />
         {SLOTS.map(s => (
           <div key={s} className="px-1 text-center capitalize text-muted-foreground">{s}</div>
