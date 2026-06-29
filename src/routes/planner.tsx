@@ -31,26 +31,25 @@ export const Route = createFileRoute("/planner")({
   ),
 });
 
-// Brand palette slot colours — warm, editorial, not Easter egg
 const SLOT_EMPTY: Record<string, string> = {
-  breakfast: "border-border bg-[#FDFAF8] hover:border-secondary/40",
-  lunch:     "border-border bg-[#FBF8F9] hover:border-secondary/40",
-  dinner:    "border-border bg-[#F8F8FA] hover:border-secondary/40",
-  snack:     "border-border bg-[#FAF9F8] hover:border-secondary/40",
+  breakfast: "border-border bg-white hover:border-secondary/40",
+  lunch:     "border-border bg-white hover:border-secondary/40",
+  dinner:    "border-border bg-white hover:border-secondary/40",
+  snack:     "border-border bg-white hover:border-secondary/40",
 };
 
 const SLOT_FILLED: Record<string, string> = {
-  breakfast: "border-secondary/30 bg-[#FEF5F0]",
-  lunch:     "border-secondary/40 bg-[#FEF0F2]",
-  dinner:    "border-secondary/20 bg-[#F5F0FE]",
-  snack:     "border-secondary/35 bg-[#F0FEF5]",
+  breakfast: "border-secondary/40 bg-[#fef2f4]",
+  lunch:     "border-secondary/40 bg-[#fef2f4]",
+  dinner:    "border-secondary/40 bg-[#fef2f4]",
+  snack:     "border-secondary/40 bg-[#fef2f4]",
 };
 
 const SLOT_HEADER: Record<string, string> = {
-  breakfast: "bg-[#FEF3ED] border-[#F5D5C0] text-[#8B5040]",
-  lunch:     "bg-[#FEF0F2] border-[#F2C5CC] text-[#8B3A48]",
-  dinner:    "bg-[#F0EFFE] border-[#D0CCED] text-[#4A4680]",
-  snack:     "bg-[#EDFEF5] border-[#B8EDD0] text-[#2D6B4A]",
+  breakfast: "bg-white border-border text-muted-foreground",
+  lunch:     "bg-white border-border text-muted-foreground",
+  dinner:    "bg-white border-border text-muted-foreground",
+  snack:     "bg-white border-border text-muted-foreground",
 };
 
 function PlannerPage() {
@@ -62,20 +61,20 @@ function PlannerPage() {
 
   return (
     <AppShell>
-      {/* Header — light, not dark */}
-      <section className="border-b border-border bg-[#FAFAF8]">
-        <div className="mx-auto max-w-6xl px-6 py-10">
+      {/* Header — pure white */}
+      <section className="border-b border-border">
+        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <div className="flex items-center gap-3 mb-3">
+              <div className="flex items-center gap-3 mb-2">
                 <div className="h-px w-6 bg-secondary" />
                 <p className="text-[9px] uppercase tracking-[0.32em] text-secondary">Plan your week</p>
               </div>
               <p className="font-script text-2xl text-secondary -mb-1">Love Coylah</p>
-              <h1 className="font-serif text-4xl sm:text-5xl font-light text-foreground">
+              <h1 className="font-serif text-3xl sm:text-4xl font-light text-foreground">
                 Weekly planner
               </h1>
-              <p className="mt-2 text-sm text-muted-foreground">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {totalMeals === 0
                   ? "Tap any slot to add a recipe. Your shopping list builds automatically."
                   : `${totalMeals} meal${totalMeals === 1 ? "" : "s"} planned this week.`}
@@ -100,18 +99,15 @@ function PlannerPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-8">
-        {/* Grid */}
-        <div className="relative overflow-x-auto pb-4">
-          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10 sm:hidden" />
-          <div className="grid min-w-[680px] grid-cols-[64px_repeat(4,1fr)] gap-2">
-
+      <section className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
+        <div className="w-full overflow-x-auto">
+          <div className="min-w-[600px] grid grid-cols-[56px_repeat(4,1fr)] gap-1.5">
             {/* Header row */}
             <div />
             {SLOTS.map((s) => (
               <div
                 key={s}
-                className={`rounded-xl border px-3 py-2.5 text-center text-[10px] font-semibold uppercase tracking-wider ${SLOT_HEADER[s]}`}
+                className={`rounded-lg border px-2 py-2 text-center text-[10px] font-semibold uppercase tracking-wider capitalize ${SLOT_HEADER[s]}`}
               >
                 {s}
               </div>
@@ -131,7 +127,7 @@ function PlannerPage() {
           </div>
         </div>
 
-        <p className="mt-5 text-xs text-muted-foreground text-center">
+        <p className="mt-4 text-xs text-muted-foreground text-center">
           Tap any slot to add a recipe · Tap × to remove · Change servings inside each recipe page
         </p>
       </section>
@@ -166,10 +162,10 @@ function DayRow({
         return (
           <div
             key={s}
-            className={`min-h-[88px] rounded-xl border text-xs transition-all duration-150 ${cls}`}
+            className={`min-h-[80px] rounded-lg border text-xs transition-all duration-150 ${cls}`}
           >
             {r ? (
-              <div className="flex h-full flex-col justify-between p-3 min-h-[88px]">
+              <div className="flex h-full flex-col justify-between p-2 min-h-[80px]">
                 <Link
                   to="/recipes/$slug"
                   params={{ slug: r.slug }}
@@ -178,7 +174,7 @@ function DayRow({
                 >
                   {r.name}
                 </Link>
-                <div className="mt-2 flex items-center justify-between">
+                <div className="mt-1 flex items-center justify-between">
                   <span className="text-[9px] uppercase tracking-wide text-secondary">{r.meal_type}</span>
                   <button
                     onClick={() => onSet(day, s, null)}
@@ -191,7 +187,7 @@ function DayRow({
               </div>
             ) : (
               <select
-                className="h-full w-full min-h-[88px] cursor-pointer bg-transparent text-muted-foreground outline-none px-3 py-2 text-xs rounded-xl"
+                className="h-full w-full min-h-[80px] cursor-pointer bg-transparent text-muted-foreground outline-none px-2 py-2 text-xs rounded-lg"
                 value=""
                 onChange={(e) => {
                   if (e.target.value)
