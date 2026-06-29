@@ -1,77 +1,37 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
-import { Upload, CheckCircle2, AlertCircle } from "lucide-react";
-import { importRecipes } from "@/lib/recipes.functions";
-import { AppShell } from "@/components/app-shell";
-import { Button } from "@/components/ui/button";
-
-export const Route = createFileRoute("/admin/import")({
-  head: () => ({
-    meta: [{ title: "Import recipes — Admin" }],
-  }),
-  component: AdminImport,
-});
-
-function AdminImport() {
-  const importFn = useServerFn(importRecipes);
-  const [text, setText] = useState("");
-  const [status, setStatus] = useState<
-    { kind: "idle" } | { kind: "ok"; count: number } | { kind: "err"; msg: string }
-  >({ kind: "idle" });
-  const [busy, setBusy] = useState(false);
-
-  async function onImport() {
-    setBusy(true);
-    setStatus({ kind: "idle" });
-    try {
-      const parsed = JSON.parse(text);
-      const recipes = Array.isArray(parsed) ? parsed : parsed.recipes;
-      if (!Array.isArray(recipes)) throw new Error("JSON must be an array of recipes");
-      const result = await importFn({ data: { recipes } });
-      setStatus({ kind: "ok", count: result.imported });
-    } catch (e) {
-      setStatus({ kind: "err", msg: e instanceof Error ? e.message : String(e) });
-    } finally {
-      setBusy(false);
-    }
+[
+  {
+    "name": "The Collagen Kitchen Granola",
+    "slug": "collagen-kitchen-granola",
+    "meal_type": "breakfast",
+    "prep_min": 10,
+    "cook_min": 45,
+    "servings": 8,
+    "collagen_boost": true,
+    "tags": ["breakfast", "make-ahead", "meal-prep", "healthy-fats"],
+    "collagen_tip": "Shop-bought granola is almost always packed with added sugar — this one isn't. Walnuts and flaxseed bring omega-3s for your skin barrier, pumpkin seeds bring zinc for collagen synthesis, and the oats keep your blood sugar steady so your skin isn't dealing with a sugar spike first thing in the morning.",
+    "notes": "Keeps in an airtight jar for up to three weeks — make a big batch on Sunday and breakfast is sorted. The trick to big clusters is to press the mixture down flat before baking and resist the urge to stir it until it's fully cooled.",
+    "ingredients": [
+      {"qty": "300", "unit": "g", "item": "rolled oats", "category": "grains"},
+      {"qty": "3", "unit": "tbsp", "item": "coconut oil, melted", "category": "fats"},
+      {"qty": "3", "unit": "tbsp", "item": "honey", "category": "cupboard"},
+      {"qty": "1", "unit": "tsp", "item": "vanilla extract", "category": "cupboard"},
+      {"qty": "1", "unit": "tsp", "item": "cinnamon", "category": "cupboard"},
+      {"qty": "1", "unit": "pinch", "item": "salt", "category": "cupboard"},
+      {"qty": "50", "unit": "g", "item": "walnuts, roughly chopped", "category": "cupboard"},
+      {"qty": "50", "unit": "g", "item": "almonds, roughly chopped", "category": "cupboard"},
+      {"qty": "40", "unit": "g", "item": "pumpkin seeds", "category": "cupboard"},
+      {"qty": "2", "unit": "tbsp", "item": "ground flaxseed", "category": "cupboard"},
+      {"qty": "40", "unit": "g", "item": "coconut flakes", "category": "cupboard"}
+    ],
+    "method": [
+      "Preheat your oven to 150°C (130°C fan) and line a large baking tray with baking paper.",
+      "In a large bowl, combine the oats, walnuts, almonds, pumpkin seeds, flaxseed, coconut flakes, cinnamon and salt. Stir well.",
+      "In a small bowl or jug, mix together the melted coconut oil, honey and vanilla extract.",
+      "Pour the wet ingredients over the dry and stir until every oat and nut is evenly coated.",
+      "Tip onto the lined tray and press down firmly into an even layer — this is what creates the clusters.",
+      "Bake for 45 minutes until golden. Do not stir during baking.",
+      "Remove from the oven and leave to cool completely on the tray before breaking into clusters.",
+      "Store in an airtight jar at room temperature for up to three weeks."
+    ]
   }
-
-  return (
-    <AppShell>
-      <section className="mx-auto max-w-3xl px-4 py-10">
-        <h1 className="font-serif text-3xl">Import recipes</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Paste a JSON array of recipes (matching the cookbook schema). Existing
-          recipes with the same slug will be updated.
-        </p>
-
-        <div className="mt-6 rounded-2xl border bg-card p-5">
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder='[{ "name": "...", "meal_type": "breakfast", "tags": [...], "servings": 2, ... }]'
-            className="h-80 w-full resize-y rounded-lg border bg-background p-3 font-mono text-xs"
-          />
-          <div className="mt-4 flex items-center gap-3">
-            <Button onClick={onImport} disabled={busy || !text.trim()}>
-              <Upload className="h-4 w-4" />
-              {busy ? "Importing…" : "Import"}
-            </Button>
-            {status.kind === "ok" && (
-              <span className="inline-flex items-center gap-1.5 text-sm text-primary">
-                <CheckCircle2 className="h-4 w-4" /> Imported {status.count}{" "}
-                {status.count === 1 ? "recipe" : "recipes"}
-              </span>
-            )}
-            {status.kind === "err" && (
-              <span className="inline-flex items-center gap-1.5 text-sm text-destructive">
-                <AlertCircle className="h-4 w-4" /> {status.msg}
-              </span>
-            )}
-          </div>
-        </div>
-      </section>
-    </AppShell>
-  );
-}
+]
