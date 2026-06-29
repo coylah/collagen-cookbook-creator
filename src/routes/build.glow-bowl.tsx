@@ -69,6 +69,7 @@ const STEPS: Step[] = [
       { label: "Tuna" },
       { label: "Salmon" },
       { label: "Mackerel" },
+      { label: "Sardines" },
       { label: "Prawns" },
       { label: "Boiled eggs" },
       { label: "Beef strips" },
@@ -137,8 +138,8 @@ const STEPS: Step[] = [
       { label: "Cashews" },
       { label: "Walnuts" },
       { label: "Pecans" },
-      { label: "Toasted pine nuts" },
-      { label: "Toasted chickpeas" },
+      { label: "Pine nuts" },
+      { label: "Chickpeas" },
       { label: "Sourdough croutons" },
     ],
   },
@@ -150,30 +151,12 @@ const STEPS: Step[] = [
     intro: "Pick one.",
     category: "cupboard",
     options: [
-      {
-        label: "Lemon Yogurt",
-        ingredients: "Greek yogurt, lemon juice, garlic, salt, pepper, parsley",
-      },
-      {
-        label: "Honey Mustard",
-        ingredients: "Olive oil, apple cider vinegar, Dijon mustard, honey, salt, pepper",
-      },
-      {
-        label: "Tahini Lemon",
-        ingredients: "Tahini, lemon juice, garlic, water, salt, pepper",
-      },
-      {
-        label: "Satay Style",
-        ingredients: "Peanut butter, lime juice, soy sauce or tamari, ginger, water",
-      },
-      {
-        label: "Balsamic Glow",
-        ingredients: "Olive oil, balsamic vinegar, Dijon mustard, salt, pepper",
-      },
-      {
-        label: "Apple Cider Vinegar Glow",
-        ingredients: "Olive oil, apple cider vinegar, lemon juice, garlic, salt, pepper",
-      },
+      { label: "Lemon Yogurt", ingredients: "Greek yogurt, lemon juice, garlic, salt, pepper, parsley" },
+      { label: "Honey Mustard", ingredients: "Olive oil, apple cider vinegar, Dijon mustard, honey, salt, pepper" },
+      { label: "Tahini Lemon", ingredients: "Tahini, lemon juice, garlic, water, salt, pepper" },
+      { label: "Satay Style", ingredients: "Peanut butter, lime juice, soy sauce or tamari, ginger, water" },
+      { label: "Balsamic Glow", ingredients: "Olive oil, balsamic vinegar, Dijon mustard, salt, pepper" },
+      { label: "Apple Cider Vinegar Glow", ingredients: "Olive oil, apple cider vinegar, lemon juice, garlic, salt, pepper" },
     ],
   },
 ];
@@ -181,46 +164,16 @@ const STEPS: Step[] = [
 type Preset = { name: string; pick: Partial<Record<string, string[]>> };
 
 const PRESETS: Preset[] = [
-  {
-    name: "Chicken & Sweet Potato Glow",
-    pick: { support: ["Sweet potato cubes"], build: ["Grilled chicken (skin on)"], activate: ["Spinach", "Red pepper"], protect: ["Avocado"], fortify: ["Pumpkin seeds"], finish: ["Lemon Yogurt"] },
-  },
-  {
-    name: "Tuna Crunch Bowl",
-    pick: { support: ["Mixed leaves"], build: ["Tuna"], activate: ["Cucumber", "Cherry tomatoes", "Red onion"], protect: ["Olive oil"], fortify: ["Sunflower seeds"], finish: ["Apple Cider Vinegar Glow"] },
-  },
-  {
-    name: "Salmon Skin Glow",
-    pick: { support: ["Brown rice"], build: ["Salmon"], activate: ["Broccoli", "Cucumber"], protect: ["Avocado"], fortify: ["Sesame seeds"], finish: ["Tahini Lemon"] },
-  },
-  {
-    name: "Turkey Taco Bowl",
-    pick: { support: ["Brown rice"], build: ["Turkey mince"], activate: ["Red pepper", "Cherry tomatoes"], protect: ["Avocado"], fortify: ["Pumpkin seeds"], finish: ["Lemon Yogurt"] },
-  },
-  {
-    name: "Prawn Mango Glow",
-    pick: { support: ["Quinoa"], build: ["Prawns"], activate: ["Mango", "Cucumber", "Red pepper"], protect: ["Avocado"], fortify: ["Sesame seeds"], finish: ["Apple Cider Vinegar Glow"] },
-  },
-  {
-    name: "Halloumi Chickpea Bowl",
-    pick: { support: ["Chickpeas"], build: ["Halloumi"], activate: ["Spinach", "Cherry tomatoes"], protect: ["Tahini drizzle"], fortify: ["Pumpkin seeds"], finish: ["Tahini Lemon"] },
-  },
-  {
-    name: "Mackerel Beetroot Bowl",
-    pick: { support: ["Lentils"], build: ["Mackerel"], activate: ["Beetroot", "Rocket", "Cucumber"], protect: ["Olive oil"], fortify: ["Walnuts"], finish: ["Balsamic Glow"] },
-  },
-  {
-    name: "Egg & Avocado Bowl",
-    pick: { support: ["Mixed leaves"], build: ["Boiled eggs"], activate: ["Cherry tomatoes", "Cucumber"], protect: ["Avocado"], fortify: ["Pumpkin seeds"], finish: ["Honey Mustard"] },
-  },
-  {
-    name: "Beef & Broccoli Bowl",
-    pick: { support: ["Brown rice"], build: ["Beef strips"], activate: ["Broccoli", "Red pepper"], protect: ["Olive oil"], fortify: ["Sesame seeds"], finish: ["Satay Style"] },
-  },
-  {
-    name: "Cottage Cheese & Grape Glow",
-    pick: { support: ["Rocket"], build: ["Cottage cheese"], activate: ["Red/purple grapes", "Cherry tomatoes", "Cucumber"], protect: ["Mozzarella pearls"], fortify: ["Toasted pine nuts"], finish: ["Balsamic Glow"] },
-  },
+  { name: "Chicken & Sweet Potato Glow", pick: { support: ["Sweet potato cubes"], build: ["Grilled chicken (skin on)"], activate: ["Spinach", "Red pepper"], protect: ["Avocado"], fortify: ["Pumpkin seeds"], finish: ["Lemon Yogurt"] } },
+  { name: "Tuna Crunch Bowl", pick: { support: ["Mixed leaves"], build: ["Tuna"], activate: ["Cucumber", "Cherry tomatoes", "Red onion"], protect: ["Olive oil"], fortify: ["Sunflower seeds"], finish: ["Apple Cider Vinegar Glow"] } },
+  { name: "Salmon Skin Glow", pick: { support: ["Brown rice"], build: ["Salmon"], activate: ["Broccoli", "Cucumber"], protect: ["Avocado"], fortify: ["Sesame seeds"], finish: ["Tahini Lemon"] } },
+  { name: "Turkey Taco Bowl", pick: { support: ["Brown rice"], build: ["Turkey mince"], activate: ["Red pepper", "Cherry tomatoes"], protect: ["Avocado"], fortify: ["Pumpkin seeds"], finish: ["Lemon Yogurt"] } },
+  { name: "Prawn Mango Glow", pick: { support: ["Quinoa"], build: ["Prawns"], activate: ["Mango", "Cucumber", "Red pepper"], protect: ["Avocado"], fortify: ["Sesame seeds"], finish: ["Apple Cider Vinegar Glow"] } },
+  { name: "Halloumi Chickpea Bowl", pick: { support: ["Chickpeas"], build: ["Halloumi"], activate: ["Cherry tomatoes"], protect: ["Tahini drizzle"], fortify: ["Pumpkin seeds"], finish: ["Tahini Lemon"] } },
+  { name: "Mackerel Beetroot Bowl", pick: { support: ["Lentils"], build: ["Mackerel"], activate: ["Beetroot", "Rocket", "Cucumber"], protect: ["Olive oil"], fortify: ["Walnuts"], finish: ["Balsamic Glow"] } },
+  { name: "Egg & Avocado Bowl", pick: { support: ["Mixed leaves"], build: ["Boiled eggs"], activate: ["Cherry tomatoes", "Cucumber"], protect: ["Avocado"], fortify: ["Pumpkin seeds"], finish: ["Honey Mustard"] } },
+  { name: "Beef & Broccoli Bowl", pick: { support: ["Brown rice"], build: ["Beef strips"], activate: ["Broccoli", "Red pepper"], protect: ["Olive oil"], fortify: ["Sesame seeds"], finish: ["Satay Style"] } },
+  { name: "Sardine & Lemon Bowl", pick: { support: ["Rocket"], build: ["Sardines"], activate: ["Cherry tomatoes", "Red onion", "Cucumber"], protect: ["Olive oil"], fortify: ["Pine nuts"], finish: ["Lemon Yogurt"] } },
 ];
 
 type Picks = Record<string, string[]>;
@@ -276,51 +229,47 @@ function GlowBowlBuilder() {
 
   return (
     <AppShell>
-      {/* Hero — warm tint, not dark */}
-      <section className="bg-[#FAFAF8] border-b border-border">
-        <div className="mx-auto max-w-6xl px-6 py-12">
-          <div className="flex items-center gap-3 mb-4">
+      {/* Hero — pure white */}
+      <section className="border-b border-border">
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+          <div className="flex items-center gap-3 mb-3">
             <div className="h-px w-6 bg-secondary" />
             <p className="text-[9px] uppercase tracking-[0.32em] text-secondary">Build your lunch</p>
             <div className="h-px w-6 bg-secondary" />
           </div>
           <p className="font-script text-2xl text-secondary -mb-1">Love Coylah</p>
-          <h1 className="font-serif text-5xl sm:text-6xl font-light leading-tight text-foreground mb-4">
+          <h1 className="font-serif text-4xl sm:text-5xl font-light leading-tight text-foreground mb-3">
             Glow Bowl Builder
           </h1>
-          <div className="w-8 h-px bg-secondary mb-5" />
-          <p className="max-w-xl text-sm text-muted-foreground leading-relaxed font-light mb-6">
-            Six steps. Support, Build, Activate, Protect, Fortify, Finish. Every step feeds a different part of your collagen story. Pick your ingredients, add to your shopping list, done.
+          <div className="w-8 h-px bg-secondary mb-4" />
+          <p className="max-w-xl text-sm text-muted-foreground leading-relaxed font-light">
+            Six steps. Support, Build, Activate, Protect, Fortify, Finish. Every step feeds a different part of your collagen story.
           </p>
           {stepsComplete > 0 && (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mt-4">
               <div className="flex gap-1">
                 {STEPS.map((s) => (
-                  <div
-                    key={s.key}
-                    className={`h-1.5 w-8 rounded-full transition-all ${(picks[s.key]?.length ?? 0) > 0 ? "bg-secondary" : "bg-border"}`}
-                  />
+                  <div key={s.key} className={`h-1.5 w-8 rounded-full transition-all ${(picks[s.key]?.length ?? 0) > 0 ? "bg-secondary" : "bg-border"}`} />
                 ))}
               </div>
-              <span className="text-xs text-muted-foreground">{stepsComplete} of 6 steps done</span>
+              <span className="text-xs text-muted-foreground">{stepsComplete} of 6 done</span>
             </div>
           )}
         </div>
       </section>
 
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[1fr_280px]">
-        <div className="space-y-4">
-
+      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 lg:grid-cols-[1fr_280px]">
+        <div className="space-y-4 min-w-0">
           {/* Presets */}
-          <section className="rounded-2xl border border-border bg-card p-6">
+          <section className="rounded-2xl border border-border bg-card p-5">
             <h2 className="font-serif text-xl mb-1">Start from a preset</h2>
-            <p className="text-sm text-muted-foreground mb-4">Tap one to pre-fill your bowl, then tweak to taste.</p>
+            <p className="text-sm text-muted-foreground mb-3">Tap one to pre-fill your bowl.</p>
             <div className="flex flex-wrap gap-2">
               {PRESETS.map((p) => (
                 <button
                   key={p.name}
                   onClick={() => applyPreset(p)}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-2 text-sm transition-all hover:border-secondary hover:bg-secondary/5 hover:text-secondary"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-sm transition-all hover:border-secondary hover:bg-secondary/5 hover:text-secondary"
                 >
                   ✦ {p.name}
                 </button>
@@ -333,20 +282,10 @@ function GlowBowlBuilder() {
             const sel = picks[step.key] ?? [];
             const isDone = sel.length > 0;
             return (
-              <section
-                key={step.key}
-                className={cn(
-                  "rounded-2xl border p-6 transition-all",
-                  isDone
-                    ? "border-secondary/30 bg-secondary/5"
-                    : "border-border bg-card"
-                )}
-              >
+              <section key={step.key} className={cn("rounded-2xl border p-5 transition-all", isDone ? "border-secondary/30 bg-secondary/5" : "border-border bg-card")}>
                 <div className="flex items-start justify-between mb-1">
                   <div>
-                    <p className="text-[9px] uppercase tracking-[0.22em] text-secondary font-medium mb-1">
-                      {step.pillar}
-                    </p>
+                    <p className="text-[9px] uppercase tracking-[0.22em] text-secondary font-medium mb-1">{step.pillar}</p>
                     <h2 className="font-serif text-xl">{step.title}</h2>
                     <p className="text-xs text-muted-foreground mt-0.5">{step.subtitle}</p>
                   </div>
@@ -356,7 +295,7 @@ function GlowBowlBuilder() {
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground mt-3 mb-4 font-light italic">{step.intro}</p>
+                <p className="text-xs text-muted-foreground mt-3 mb-3 italic">{step.intro}</p>
                 <div className="flex flex-wrap gap-2">
                   {step.options.map((opt) => {
                     const active = sel.includes(opt.label);
@@ -365,17 +304,15 @@ function GlowBowlBuilder() {
                         <button
                           onClick={() => togglePick(step.key, opt.label)}
                           className={cn(
-                            "rounded-full border px-3.5 py-1.5 text-sm transition-all",
-                            active
-                              ? "border-secondary bg-secondary text-secondary-foreground font-medium"
-                              : "border-border bg-background text-foreground/70 hover:border-secondary/50 hover:bg-secondary/5"
+                            "rounded-full border px-3 py-1.5 text-sm transition-all",
+                            active ? "border-secondary bg-secondary text-secondary-foreground font-medium" : "border-border bg-background text-foreground/70 hover:border-secondary/50 hover:bg-secondary/5"
                           )}
                         >
                           {active && <Check className="mr-1 inline h-3 w-3" />}
                           {opt.label}
                         </button>
                         {opt.ingredients && active && (
-                          <p className="px-3.5 text-[11px] text-muted-foreground italic">{opt.ingredients}</p>
+                          <p className="px-3 text-[11px] text-muted-foreground italic">{opt.ingredients}</p>
                         )}
                       </div>
                     );
@@ -395,9 +332,7 @@ function GlowBowlBuilder() {
               </span>
               <div>
                 <p className="font-serif text-lg">Your bowl</p>
-                <p className="text-xs text-muted-foreground">
-                  {totalPicked === 0 ? "Nothing picked yet" : `${totalPicked} ingredient${totalPicked === 1 ? "" : "s"}`}
-                </p>
+                <p className="text-xs text-muted-foreground">{totalPicked === 0 ? "Nothing picked yet" : `${totalPicked} ingredient${totalPicked === 1 ? "" : "s"}`}</p>
               </div>
             </div>
 
@@ -412,26 +347,18 @@ function GlowBowlBuilder() {
                   if (!items.length) return null;
                   return (
                     <li key={s.key}>
-                      <p className="text-[9px] uppercase tracking-wider text-secondary mb-1">
-                        {s.pillar}
-                      </p>
+                      <p className="text-[9px] uppercase tracking-wider text-secondary mb-1">{s.pillar}</p>
                       <ul className="space-y-1">
                         {items.map((label) => (
                           <li key={label} className="flex flex-col gap-0.5">
                             <div className="flex items-center justify-between gap-2">
                               <span className="text-sm">{label}</span>
-                              <button
-                                onClick={() => togglePick(s.key, label)}
-                                className="grid h-5 w-5 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted"
-                                aria-label="Remove"
-                              >
+                              <button onClick={() => togglePick(s.key, label)} className="grid h-5 w-5 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted" aria-label="Remove">
                                 <X className="h-3 w-3" />
                               </button>
                             </div>
                             {s.key === "finish" && getDressingIngredients(label) && (
-                              <p className="text-[11px] text-muted-foreground italic">
-                                {getDressingIngredients(label)}
-                              </p>
+                              <p className="text-[11px] text-muted-foreground italic">{getDressingIngredients(label)}</p>
                             )}
                           </li>
                         ))}
@@ -443,24 +370,12 @@ function GlowBowlBuilder() {
             )}
 
             <div className="flex flex-col gap-2">
-              <Button
-                onClick={addToShopping}
-                disabled={totalPicked === 0}
-                className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90"
-              >
+              <Button onClick={addToShopping} disabled={totalPicked === 0} className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90">
                 <ShoppingBasket className="h-4 w-4" />
                 {added ? "Added to your list!" : "Add bowl to shopping list"}
               </Button>
-              {added && (
-                <Link to="/shopping" className="text-center text-xs text-secondary underline underline-offset-2">
-                  View shopping list →
-                </Link>
-              )}
-              {totalPicked > 0 && (
-                <button onClick={reset} className="text-center text-xs text-muted-foreground hover:text-foreground">
-                  Start over
-                </button>
-              )}
+              {added && <Link to="/shopping" className="text-center text-xs text-secondary underline underline-offset-2">View shopping list →</Link>}
+              {totalPicked > 0 && <button onClick={reset} className="text-center text-xs text-muted-foreground hover:text-foreground">Start over</button>}
             </div>
           </div>
         </aside>
