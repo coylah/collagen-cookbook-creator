@@ -128,7 +128,6 @@ const STEPS: Step[] = [
     category: "cupboard",
     options: [
       { label: "Cinnamon", note: "Anti-inflammatory and helps regulate blood sugar — a perfect pairing with fruit" },
-      { label: "Turmeric", note: "Powerful anti-inflammatory. Just a pinch with some black pepper" },
       { label: "Ginger", note: "Fresh grated or ground — anti-inflammatory and great for gut health" },
       { label: "Vanilla extract", note: "A few drops makes everything taste more indulgent with zero sugar" },
       { label: "Cocoa powder", note: "Stir into your base for a chocolate yoghurt — rich in antioxidants" },
@@ -144,38 +143,14 @@ const STEPS: Step[] = [
 type Preset = { name: string; pick: Partial<Record<string, string[]>> };
 
 const PRESETS: Preset[] = [
-  {
-    name: "Berry Glow Bowl",
-    pick: { base: ["Greek yoghurt"], fruit: ["Mixed berries", "Pomegranate seeds"], crunch: ["Homemade granola", "Pumpkin seeds"], drizzle: ["Honey"], boost: ["Cinnamon"] },
-  },
-  {
-    name: "Tropical Skin Glow",
-    pick: { base: ["Greek yoghurt"], fruit: ["Mango chunks", "Pineapple chunks", "Kiwi"], crunch: ["Coconut flakes", "Cashews"], drizzle: ["Honey"], boost: ["Lemon zest"] },
-  },
-  {
-    name: "Chocolate Berry Fix",
-    pick: { base: ["Greek yoghurt"], fruit: ["Raspberries", "Cherries"], crunch: ["Cacao nibs", "Walnuts"], drizzle: ["Melted dark chocolate"], boost: ["Cocoa powder"] },
-  },
-  {
-    name: "Peanut Butter Banana",
-    pick: { base: ["Greek yoghurt"], fruit: ["Banana", "Strawberries"], crunch: ["Homemade granola", "Chia seeds"], drizzle: ["Peanut butter"], boost: ["Cinnamon"] },
-  },
-  {
-    name: "Skyr Power Bowl",
-    pick: { base: ["Skyr"], fruit: ["Blueberries", "Kiwi", "Goji berries"], crunch: ["Hemp seeds", "Pumpkin seeds", "Crushed almonds"], drizzle: ["Honey"], boost: ["Matcha powder"] },
-  },
-  {
-    name: "Peach & Almond Glow",
-    pick: { base: ["Greek yoghurt"], fruit: ["Peach", "Raspberries"], crunch: ["Crushed almonds", "Flaxseed"], drizzle: ["Almond butter"], boost: ["Vanilla extract"] },
-  },
-  {
-    name: "Fig & Walnut Glow",
-    pick: { base: ["Skyr"], fruit: ["Fig slices", "Blackberries"], crunch: ["Walnuts", "Sesame seeds"], drizzle: ["Honey"], boost: ["Orange zest"] },
-  },
-  {
-    name: "Dairy Free Mango Bowl",
-    pick: { base: ["Coconut yoghurt"], fruit: ["Mango chunks", "Passion fruit", "Kiwi"], crunch: ["Coconut flakes", "Macadamia nuts"], drizzle: ["Maple syrup"], boost: ["Ginger"] },
-  },
+  { name: "Berry Glow Bowl", pick: { base: ["Greek yoghurt"], fruit: ["Mixed berries", "Pomegranate seeds"], crunch: ["Homemade granola", "Pumpkin seeds"], drizzle: ["Honey"], boost: ["Cinnamon"] } },
+  { name: "Tropical Skin Glow", pick: { base: ["Greek yoghurt"], fruit: ["Mango chunks", "Pineapple chunks", "Kiwi"], crunch: ["Coconut flakes", "Cashews"], drizzle: ["Honey"], boost: ["Lemon zest"] } },
+  { name: "Chocolate Berry Fix", pick: { base: ["Greek yoghurt"], fruit: ["Raspberries", "Cherries"], crunch: ["Cacao nibs", "Walnuts"], drizzle: ["Melted dark chocolate"], boost: ["Cocoa powder"] } },
+  { name: "Peanut Butter Banana", pick: { base: ["Greek yoghurt"], fruit: ["Banana", "Strawberries"], crunch: ["Homemade granola", "Chia seeds"], drizzle: ["Peanut butter"], boost: ["Cinnamon"] } },
+  { name: "Skyr Power Bowl", pick: { base: ["Skyr"], fruit: ["Blueberries", "Kiwi", "Goji berries"], crunch: ["Hemp seeds", "Pumpkin seeds", "Crushed almonds"], drizzle: ["Honey"], boost: ["Matcha powder"] } },
+  { name: "Peach & Almond Glow", pick: { base: ["Greek yoghurt"], fruit: ["Peach", "Raspberries"], crunch: ["Crushed almonds", "Flaxseed"], drizzle: ["Almond butter"], boost: ["Vanilla extract"] } },
+  { name: "Fig & Walnut Glow", pick: { base: ["Skyr"], fruit: ["Fig slices", "Blackberries"], crunch: ["Walnuts", "Sesame seeds"], drizzle: ["Honey"], boost: ["Orange zest"] } },
+  { name: "Dairy Free Mango Bowl", pick: { base: ["Coconut yoghurt"], fruit: ["Mango chunks", "Passion fruit", "Kiwi"], crunch: ["Coconut flakes", "Macadamia nuts"], drizzle: ["Maple syrup"], boost: ["Ginger"] } },
 ];
 
 type Picks = Record<string, string[]>;
@@ -226,51 +201,48 @@ function YoghurtBowlBuilder() {
 
   return (
     <AppShell>
-      {/* Hero */}
-      <section className="bg-[#FAFAF8] border-b border-border">
-        <div className="mx-auto max-w-6xl px-6 py-12">
-          <div className="flex items-center gap-3 mb-4">
+      {/* Hero — pure white */}
+      <section className="border-b border-border">
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+          <div className="flex items-center gap-3 mb-3">
             <div className="h-px w-6 bg-secondary" />
             <p className="text-[9px] uppercase tracking-[0.32em] text-secondary">Build your breakfast</p>
             <div className="h-px w-6 bg-secondary" />
           </div>
           <p className="font-script text-2xl text-secondary -mb-1">Love Coylah</p>
-          <h1 className="font-serif text-5xl sm:text-6xl font-light leading-tight text-foreground mb-4">
+          <h1 className="font-serif text-4xl sm:text-5xl font-light leading-tight text-foreground mb-3">
             Yoghurt Bowl Builder
           </h1>
-          <div className="w-8 h-px bg-secondary mb-5" />
-          <p className="max-w-xl text-sm text-muted-foreground leading-relaxed font-light mb-6">
-            Five steps to a collagen-supporting breakfast bowl. Base, fruit, crunch, drizzle and a boost — each layer doing something specific for your skin. Pick yours, add to your shopping list, done.
+          <div className="w-8 h-px bg-secondary mb-4" />
+          <p className="max-w-xl text-sm text-muted-foreground leading-relaxed font-light">
+            Five steps to a collagen-supporting breakfast bowl. Base, Activate, Fortify, Protect, Boost — each layer doing something specific for your skin.
           </p>
           {stepsComplete > 0 && (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mt-4">
               <div className="flex gap-1">
                 {STEPS.map((s) => (
-                  <div
-                    key={s.key}
-                    className={`h-1.5 w-8 rounded-full transition-all ${(picks[s.key]?.length ?? 0) > 0 ? "bg-secondary" : "bg-border"}`}
-                  />
+                  <div key={s.key} className={`h-1.5 w-8 rounded-full transition-all ${(picks[s.key]?.length ?? 0) > 0 ? "bg-secondary" : "bg-border"}`} />
                 ))}
               </div>
-              <span className="text-xs text-muted-foreground">{stepsComplete} of 5 steps done</span>
+              <span className="text-xs text-muted-foreground">{stepsComplete} of 5 done</span>
             </div>
           )}
         </div>
       </section>
 
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[1fr_280px]">
-        <div className="space-y-4">
+      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 lg:grid-cols-[1fr_280px]">
+        <div className="space-y-4 min-w-0">
 
           {/* Presets */}
-          <section className="rounded-2xl border border-border bg-card p-6">
+          <section className="rounded-2xl border border-border bg-card p-5">
             <h2 className="font-serif text-xl mb-1">Start from a preset</h2>
-            <p className="text-sm text-muted-foreground mb-4">Tap one to pre-fill your bowl, then tweak to taste.</p>
+            <p className="text-sm text-muted-foreground mb-3">Tap one to pre-fill your bowl, then tweak to taste.</p>
             <div className="flex flex-wrap gap-2">
               {PRESETS.map((p) => (
                 <button
                   key={p.name}
                   onClick={() => applyPreset(p)}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-2 text-sm transition-all hover:border-secondary hover:bg-secondary/5 hover:text-secondary"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-sm transition-all hover:border-secondary hover:bg-secondary/5 hover:text-secondary"
                 >
                   ✦ {p.name}
                 </button>
@@ -283,13 +255,7 @@ function YoghurtBowlBuilder() {
             const sel = picks[step.key] ?? [];
             const isDone = sel.length > 0;
             return (
-              <section
-                key={step.key}
-                className={cn(
-                  "rounded-2xl border p-6 transition-all",
-                  isDone ? "border-secondary/30 bg-secondary/5" : "border-border bg-card"
-                )}
-              >
+              <section key={step.key} className={cn("rounded-2xl border p-5 transition-all", isDone ? "border-secondary/30 bg-secondary/5" : "border-border bg-card")}>
                 <div className="flex items-start justify-between mb-1">
                   <div>
                     <p className="text-[9px] uppercase tracking-[0.22em] text-secondary font-medium mb-1">{step.pillar}</p>
@@ -302,7 +268,7 @@ function YoghurtBowlBuilder() {
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-muted-foreground mt-3 mb-4 font-light italic">{step.intro}</p>
+                <p className="text-xs text-muted-foreground mt-3 mb-3 italic">{step.intro}</p>
                 <div className="flex flex-wrap gap-2">
                   {step.options.map((opt) => {
                     const active = sel.includes(opt.label);
@@ -311,17 +277,15 @@ function YoghurtBowlBuilder() {
                         <button
                           onClick={() => togglePick(step.key, opt.label)}
                           className={cn(
-                            "rounded-full border px-3.5 py-1.5 text-sm transition-all text-left",
-                            active
-                              ? "border-secondary bg-secondary text-secondary-foreground font-medium"
-                              : "border-border bg-background text-foreground/70 hover:border-secondary/50 hover:bg-secondary/5"
+                            "rounded-full border px-3 py-1.5 text-sm transition-all text-left",
+                            active ? "border-secondary bg-secondary text-secondary-foreground font-medium" : "border-border bg-background text-foreground/70 hover:border-secondary/50 hover:bg-secondary/5"
                           )}
                         >
                           {active && <Check className="mr-1 inline h-3 w-3" />}
                           {opt.label}
                         </button>
                         {opt.note && active && (
-                          <p className="px-3.5 text-[11px] text-muted-foreground italic max-w-xs">{opt.note}</p>
+                          <p className="px-3 text-[11px] text-muted-foreground italic max-w-xs">{opt.note}</p>
                         )}
                       </div>
                     );
@@ -336,14 +300,10 @@ function YoghurtBowlBuilder() {
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="rounded-2xl border border-border bg-card p-5">
             <div className="flex items-center gap-2 mb-4">
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-secondary/10 shrink-0 text-lg">
-                🥣
-              </span>
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-secondary/10 shrink-0 text-lg">🥣</span>
               <div>
                 <p className="font-serif text-lg">Your bowl</p>
-                <p className="text-xs text-muted-foreground">
-                  {totalPicked === 0 ? "Nothing picked yet" : `${totalPicked} ingredient${totalPicked === 1 ? "" : "s"}`}
-                </p>
+                <p className="text-xs text-muted-foreground">{totalPicked === 0 ? "Nothing picked yet" : `${totalPicked} ingredient${totalPicked === 1 ? "" : "s"}`}</p>
               </div>
             </div>
 
@@ -363,11 +323,7 @@ function YoghurtBowlBuilder() {
                         {items.map((label) => (
                           <li key={label} className="flex items-center justify-between gap-2">
                             <span className="text-sm">{label}</span>
-                            <button
-                              onClick={() => togglePick(s.key, label)}
-                              className="grid h-5 w-5 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted"
-                              aria-label="Remove"
-                            >
+                            <button onClick={() => togglePick(s.key, label)} className="grid h-5 w-5 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-muted" aria-label="Remove">
                               <X className="h-3 w-3" />
                             </button>
                           </li>
@@ -380,24 +336,12 @@ function YoghurtBowlBuilder() {
             )}
 
             <div className="flex flex-col gap-2">
-              <Button
-                onClick={addToShopping}
-                disabled={totalPicked === 0}
-                className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90"
-              >
+              <Button onClick={addToShopping} disabled={totalPicked === 0} className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90">
                 <ShoppingBasket className="h-4 w-4" />
                 {added ? "Added to your list!" : "Add bowl to shopping list"}
               </Button>
-              {added && (
-                <Link to="/shopping" className="text-center text-xs text-secondary underline underline-offset-2">
-                  View shopping list →
-                </Link>
-              )}
-              {totalPicked > 0 && (
-                <button onClick={reset} className="text-center text-xs text-muted-foreground hover:text-foreground">
-                  Start over
-                </button>
-              )}
+              {added && <Link to="/shopping" className="text-center text-xs text-secondary underline underline-offset-2">View shopping list →</Link>}
+              {totalPicked > 0 && <button onClick={reset} className="text-center text-xs text-muted-foreground hover:text-foreground">Start over</button>}
             </div>
           </div>
         </aside>
