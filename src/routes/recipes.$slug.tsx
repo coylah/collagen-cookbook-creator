@@ -107,7 +107,7 @@ function RecipePage() {
 
         <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
 
-          {/* ── Header ── */}
+          {/* Header */}
           <div className="relative bg-[#FAFAF8] px-8 py-10 sm:px-12 border-b border-border">
             <div className="absolute right-8 top-8 opacity-30 no-print">
               <RecipeStamp mealType={recipe.meal_type} />
@@ -138,7 +138,7 @@ function RecipePage() {
                 size="sm"
                 variant={fav ? "default" : "outline"}
                 onClick={() => toggle(recipe.slug)}
-                className={fav ? "bg-secondary text-secondary-foreground hover:bg-secondary/90" : ""}
+                className={fav ? "bg-secondary text-secondary-foreground hover:bg-secondary/90" : "border-secondary/40 hover:border-secondary hover:text-secondary"}
               >
                 <Heart className={cn("h-3.5 w-3.5", fav && "fill-secondary-foreground")} />
                 {fav ? "Saved" : "Save recipe"}
@@ -147,11 +147,17 @@ function RecipePage() {
                 size="sm"
                 variant="outline"
                 onClick={() => setShowPlanPicker(v => !v)}
+                className="border-secondary/40 hover:border-secondary hover:text-secondary"
               >
                 <CalendarPlus className="h-3.5 w-3.5" />
                 {showPlanPicker ? "Cancel" : "Add to meal plan"}
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => window.print()}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => window.print()}
+                className="hover:text-secondary"
+              >
                 Print
               </Button>
             </div>
@@ -172,7 +178,7 @@ function RecipePage() {
             )}
           </div>
 
-          {/* ── Coylah's Tips — TOP ── */}
+          {/* Coylah's Tips — TOP */}
           {recipe.notes && (
             <div className="border-b border-border bg-[#fef2f4] px-8 py-6 sm:px-12">
               <p className="mb-2 text-[9px] uppercase tracking-[0.22em] text-secondary font-medium">
@@ -184,7 +190,7 @@ function RecipePage() {
             </div>
           )}
 
-          {/* ── Ingredients + Method ── */}
+          {/* Ingredients + Method */}
           <div className="grid gap-0 lg:grid-cols-[1fr_1.4fr]">
             <section className="border-b border-border px-8 py-8 lg:border-b-0 lg:border-r lg:px-10">
               <div className="mb-5 flex items-center justify-between">
@@ -270,13 +276,13 @@ function RecipePage() {
             </section>
           </div>
 
-          {/* ── The Glow Factor — BOTTOM ── */}
+          {/* The Glow Factor — BOTTOM — now matches Coylah's Tips style */}
           {recipe.collagen_tip && !glowFactorIsDuplicate && (
-            <div className="border-t border-border bg-foreground px-8 py-8 sm:px-12">
+            <div className="border-t border-border bg-[#fef2f4] px-8 py-8 sm:px-12">
               <p className="mb-3 text-[9px] uppercase tracking-[0.22em] text-secondary font-medium">
                 ✦ The glow factor
               </p>
-              <p className="font-serif text-xl font-light leading-relaxed text-background/90">
+              <p className="font-serif text-xl font-light leading-relaxed text-foreground/80">
                 {recipe.collagen_tip}
               </p>
             </div>
