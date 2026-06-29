@@ -57,6 +57,7 @@ function ShoppingPage() {
   const { extras, remove: removeExtra, clear: clearExtras } = useShoppingExtras();
   const { items: manualItems, addItem, toggleItem, removeItem, clearAll: clearManual } = useManualItems();
   const [bought, setBought] = useState<Record<string, boolean>>({});
+  const [boughtExtras, setBoughtExtras] = useState<Record<string, boolean>>({});
   const [manualInput, setManualInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -107,6 +108,7 @@ function ShoppingPage() {
     reset();
     clearManual();
     setBought({});
+    setBoughtExtras({});
   }
 
   function handleAddManual(e: React.FormEvent) {
@@ -119,21 +121,19 @@ function ShoppingPage() {
 
   const subtitle = hasContent
     ? entries.length > 0 && extras.length > 0
-      ? "Your shopping list from your meal plan and Glow Bowl extras."
+      ? "Your shopping list from your meal plan and bowl extras."
       : entries.length > 0
       ? "Your ingredients, grouped and ready to shop."
-      : "Your Glow Bowl extras, ready to shop."
+      : "Your bowl extras, ready to shop."
     : "";
 
   return (
     <AppShell>
-      <section className="mx-auto max-w-4xl px-4 py-10">
+      <section className="mx-auto max-w-4xl px-4 py-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="font-serif text-3xl">Shopping list</h1>
-            {subtitle && (
-              <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
-            )}
+            {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
           </div>
           {hasContent && (
             <div className="flex items-center gap-2">
@@ -148,7 +148,7 @@ function ShoppingPage() {
                 onClick={clearAll}
                 className="text-muted-foreground hover:text-destructive"
               >
-                <Trash2 className="h-4 w-4" /> Clear list
+                <Trash2 className="h-4 w-4" /> Clear extras & manual
               </Button>
               <Button variant="outline" size="sm" onClick={() => window.print()}>
                 <Printer className="h-4 w-4" /> Print
@@ -157,31 +157,33 @@ function ShoppingPage() {
           )}
         </div>
 
+        {entries.length > 0 && (
+          <p className="mt-2 text-xs text-muted-foreground border border-border rounded-lg px-3 py-2">
+            Ingredients from your meal plan clear automatically when you remove recipes from your planner.
+          </p>
+        )}
+
         {!hasContent ? (
           <div className="mt-12 rounded-2xl border bg-card p-12 text-center">
             <ShoppingBasket className="mx-auto h-8 w-8 text-muted-foreground" />
             <p className="mt-3 font-serif text-lg">Your list is empty</p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Add recipes to your planner or build a Glow Bowl to get started.
+              Add recipes to your planner or build a bowl to get started.
             </p>
             <div className="mt-4 flex justify-center gap-3">
-              <Link to="/planner" className="text-sm text-secondary underline underline-offset-2">
-                Plan your week
-              </Link>
+              <Link to="/planner" className="text-sm text-secondary underline underline-offset-2">Plan your week</Link>
               <span className="text-muted-foreground">·</span>
-              <Link to="/build/glow-bowl" className="text-sm text-secondary underline underline-offset-2">
-                Build a Glow Bowl
-              </Link>
+              <Link to="/build/glow-bowl" className="text-sm text-secondary underline underline-offset-2">Build a Glow Bowl</Link>
             </div>
           </div>
         ) : (
-          <div className="mt-8 space-y-6">
+          <div className="mt-6 space-y-4">
 
-            {/* Recipe items grouped by category */}
+            {/* Recipe items */}
             {grouped.map(([cat, items]) => (
               <div key={cat} className="rounded-2xl border bg-card p-5">
-                <h2 className="font-serif text-lg">{CATEGORY_LABEL[cat] ?? cat}</h2>
-                <ul className="mt-3 divide-y divide-border/60">
+                <h2 className="font-serif text-lg mb-3">{CATEGORY_LABEL[cat] ?? cat}</h2>
+                <ul className="divide-y divide-border/60">
                   {items.map((item) => (
                     <ShoppingRow
                       key={item.key}
@@ -195,30 +197,39 @@ function ShoppingPage() {
               </div>
             ))}
 
-            {/* Glow Bowl extras */}
+            {/* Bowl extras — now with checkboxes */}
             {extras.length > 0 && (
               <div className="rounded-2xl border border-secondary/30 bg-card p-5">
-                <div className="flex items-center justify-between">
-                  <h2 className="font-serif text-lg">Glow Bowl extras</h2>
-                  <button
-                    onClick={clearExtras}
-                    className="text-xs text-muted-foreground hover:text-foreground"
-                  >
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="font-serif text-lg">Bowl extras</h2>
+                  <button onClick={clearExtras} className="text-xs text-muted-foreground hover:text-foreground">
                     Clear all
                   </button>
                 </div>
                 {Object.entries(extrasByCategory).map(([cat, items]) => (
-                  <div key={cat} className="mt-3">
-                    <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
+                  <div key={cat} className="mb-3">
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
                       {CATEGORY_LABEL[cat] ?? cat}
                     </p>
-                    <ul className="mt-1 divide-y divide-border/60">
+                    <ul className="divide-y divide-border/60">
                       {items.map((e) => (
-                        <li key={e.item} className="flex items-center justify-between py-2 text-sm">
-                          <span>{e.item}</span>
+                        <li key={e.item} className="flex items-center gap-3 py-2.5">
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 accent-secondary"
+                            checked={!!boughtExtras[e.item]}
+                            onChange={() => setBoughtExtras(b => ({ ...b, [e.item]: !b[e.item] }))}
+                          />
+                          <span className={cn(
+                            "flex-1 text-sm",
+                            boughtExtras[e.item] && "text-muted-foreground line-through"
+                          )}>
+                            {e.item}
+                          </span>
                           <button
                             onClick={() => removeExtra(e.item)}
                             className="grid h-6 w-6 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+                            aria-label="Remove"
                           >
                             <X className="h-3.5 w-3.5" />
                           </button>
@@ -253,7 +264,7 @@ function ShoppingPage() {
               </details>
             )}
 
-            {/* Manual items */}
+            {/* Manual add */}
             <div className="rounded-2xl border bg-card p-5">
               <h2 className="font-serif text-lg mb-4">Add anything else</h2>
               <form onSubmit={handleAddManual} className="flex gap-2 mb-4">
@@ -273,7 +284,7 @@ function ShoppingPage() {
                   <Plus className="h-4 w-4" /> Add
                 </button>
               </form>
-              {manualItems.length > 0 && (
+              {manualItems.length > 0 ? (
                 <ul className="divide-y divide-border/60">
                   {manualItems.map((item) => (
                     <li key={item.addedAt} className="flex items-center gap-3 py-2.5">
@@ -283,10 +294,7 @@ function ShoppingPage() {
                         checked={item.checked}
                         onChange={() => toggleItem(item.addedAt)}
                       />
-                      <span className={cn(
-                        "flex-1 text-sm",
-                        item.checked && "text-muted-foreground line-through"
-                      )}>
+                      <span className={cn("flex-1 text-sm", item.checked && "text-muted-foreground line-through")}>
                         {item.text}
                       </span>
                       <button
@@ -298,14 +306,12 @@ function ShoppingPage() {
                     </li>
                   ))}
                 </ul>
-              )}
-              {manualItems.length === 0 && (
+              ) : (
                 <p className="text-sm text-muted-foreground">
-                  Add coffee, toiletries, school snacks — anything else you need this week.
+                  Add coffee, toiletries or anything else you need this week.
                 </p>
               )}
             </div>
-
           </div>
         )}
       </section>
@@ -313,12 +319,7 @@ function ShoppingPage() {
   );
 }
 
-function ShoppingRow({
-  item,
-  checked,
-  onCheck,
-  onHave,
-}: {
+function ShoppingRow({ item, checked, onCheck, onHave }: {
   item: ShoppingItem;
   checked: boolean;
   onCheck: () => void;
@@ -332,13 +333,13 @@ function ShoppingRow({
         checked={checked}
         onChange={onCheck}
       />
-      <div className="flex-1">
+      <div className="flex-1 min-w-0">
         <p className={cn("text-sm", checked && "text-muted-foreground line-through")}>
           {item.qtyText && <strong>{item.qtyText} </strong>}
           {item.unit && !item.staple && <span className="text-muted-foreground">{item.unit} </span>}
           {item.item}
         </p>
-        <p className="text-[11px] text-muted-foreground">
+        <p className="text-[11px] text-muted-foreground truncate">
           {item.fromRecipes.join(", ")}
         </p>
       </div>
