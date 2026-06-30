@@ -1,11 +1,20 @@
 import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Recipe } from "./recipe-types";
+import type { Database } from "@/integrations/supabase/types";
+
+function publicClient() {
+  return createClient<Database>(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
+  );
+}
 
 export const listRecipes = createServerFn({ method: "GET" }).handler(
   async (): Promise<Recipe[]> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await publicClient()
       .from("recipes")
       .select("*")
       .order("name");
@@ -17,8 +26,7 @@ export const listRecipes = createServerFn({ method: "GET" }).handler(
 export const getRecipeBySlug = createServerFn({ method: "GET" })
   .inputValidator((d) => z.object({ slug: z.string() }).parse(d))
   .handler(async ({ data }): Promise<Recipe | null> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row, error } = await supabaseAdmin
+    const { data: row, error } = await publicClient()
       .from("recipes")
       .select("*")
       .eq("slug", data.slug)

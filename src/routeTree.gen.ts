@@ -14,6 +14,7 @@ import { Route as PlannerRouteImport } from './routes/planner'
 import { Route as FavouritesRouteImport } from './routes/favourites'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RecipesSlugRouteImport } from './routes/recipes.$slug'
+import { Route as BuildYoghurtBowlRouteImport } from './routes/build.yoghurt-bowl'
 import { Route as BuildGlowBowlRouteImport } from './routes/build.glow-bowl'
 import { Route as AdminImportRouteImport } from './routes/admin.import'
 
@@ -42,6 +43,11 @@ const RecipesSlugRoute = RecipesSlugRouteImport.update({
   path: '/recipes/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BuildYoghurtBowlRoute = BuildYoghurtBowlRouteImport.update({
+  id: '/build/yoghurt-bowl',
+  path: '/build/yoghurt-bowl',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BuildGlowBowlRoute = BuildGlowBowlRouteImport.update({
   id: '/build/glow-bowl',
   path: '/build/glow-bowl',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/shopping': typeof ShoppingRoute
   '/admin/import': typeof AdminImportRoute
   '/build/glow-bowl': typeof BuildGlowBowlRoute
+  '/build/yoghurt-bowl': typeof BuildYoghurtBowlRoute
   '/recipes/$slug': typeof RecipesSlugRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/shopping': typeof ShoppingRoute
   '/admin/import': typeof AdminImportRoute
   '/build/glow-bowl': typeof BuildGlowBowlRoute
+  '/build/yoghurt-bowl': typeof BuildYoghurtBowlRoute
   '/recipes/$slug': typeof RecipesSlugRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/shopping': typeof ShoppingRoute
   '/admin/import': typeof AdminImportRoute
   '/build/glow-bowl': typeof BuildGlowBowlRoute
+  '/build/yoghurt-bowl': typeof BuildYoghurtBowlRoute
   '/recipes/$slug': typeof RecipesSlugRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/shopping'
     | '/admin/import'
     | '/build/glow-bowl'
+    | '/build/yoghurt-bowl'
     | '/recipes/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/shopping'
     | '/admin/import'
     | '/build/glow-bowl'
+    | '/build/yoghurt-bowl'
     | '/recipes/$slug'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/shopping'
     | '/admin/import'
     | '/build/glow-bowl'
+    | '/build/yoghurt-bowl'
     | '/recipes/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   ShoppingRoute: typeof ShoppingRoute
   AdminImportRoute: typeof AdminImportRoute
   BuildGlowBowlRoute: typeof BuildGlowBowlRoute
+  BuildYoghurtBowlRoute: typeof BuildYoghurtBowlRoute
   RecipesSlugRoute: typeof RecipesSlugRoute
 }
 
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RecipesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/build/yoghurt-bowl': {
+      id: '/build/yoghurt-bowl'
+      path: '/build/yoghurt-bowl'
+      fullPath: '/build/yoghurt-bowl'
+      preLoaderRoute: typeof BuildYoghurtBowlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/build/glow-bowl': {
       id: '/build/glow-bowl'
       path: '/build/glow-bowl'
@@ -182,18 +202,9 @@ const rootRouteChildren: RootRouteChildren = {
   ShoppingRoute: ShoppingRoute,
   AdminImportRoute: AdminImportRoute,
   BuildGlowBowlRoute: BuildGlowBowlRoute,
+  BuildYoghurtBowlRoute: BuildYoghurtBowlRoute,
   RecipesSlugRoute: RecipesSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
