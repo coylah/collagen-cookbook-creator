@@ -159,7 +159,7 @@ function Cookbook() {
               className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm text-muted-foreground hover:border-secondary hover:text-secondary transition-colors"
             >
               <Info className="h-4 w-4" />
-              {showGuide ? "Hide guide" : "Get the most out of this"}
+              {showGuide ? "Hide guide" : "How To Guide"}
             </button>
           </div>
 
