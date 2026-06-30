@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/app-shell";
-import { upsertRecipes } from "@/lib/recipes.functions";
+import { importRecipes } from "@/lib/recipes.functions";
 
 export const Route = createFileRoute("/admin/import")({
   component: ImportPage,
@@ -17,8 +17,8 @@ function ImportPage() {
     setStatus(null);
     try {
       const data = JSON.parse(json);
-      const result = await upsertRecipes({ data: { recipes: data } });
-      setStatus(`Done — ${result.count} recipe${result.count === 1 ? "" : "s"} imported.`);
+      const result = await importRecipes({ data: { recipes: data } });
+      setStatus(`Done — ${result.imported} recipe${result.imported === 1 ? "" : "s"} imported.`);
       setJson("");
     } catch (e: any) {
       setStatus(`Error: ${e.message}`);
@@ -38,7 +38,7 @@ function ImportPage() {
           value={json}
           onChange={(e) => setJson(e.target.value)}
           className="w-full h-64 rounded-xl border border-border bg-muted/30 p-4 font-mono text-xs outline-none focus:border-secondary"
-          placeholder='[{ "name": "...", "slug": "...", ... }]'
+          placeholder='[{ "name": "...", "meal_type": "...", ... }]'
         />
         <button
           onClick={handleSubmit}
