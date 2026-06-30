@@ -133,6 +133,11 @@ const PRESETS: Preset[] = [
 
 type Picks = Record<string, string[]>;
 
+// Splits dressing ingredient strings into individual shopping items
+function expandIngredients(ingredientString: string): string[] {
+  return ingredientString.split(",").map((s) => s.trim()).filter(Boolean);
+}
+
 function GlowBowlBuilder() {
   const [picks, setPicks] = useState<Picks>({});
   const [added, setAdded] = useState(false);
@@ -162,10 +167,25 @@ function GlowBowlBuilder() {
 
   function reset() { setPicks({}); setAdded(false); setPlannedTo(null); }
 
+  // Builds the real shopping list — expands dressings into actual ingredients
   const allPicked = useMemo(() => {
     const out: { item: string; category: string }[] = [];
     for (const step of STEPS) {
-      for (const label of picks[step.key] ?? []) out.push({ item: label, category: step.category });
+      for (const label of picks[step.key] ?? []) {
+        if (step.key === "finish") {
+          // Dressing — expand into individual ingredients, not just the dressing name
+          const opt = step.options.find((o) => o.label === label);
+          if (opt?.ingredients) {
+            for (const ing of expandIngredients(opt.ingredients)) {
+              out.push({ item: ing, category: "cupboard" });
+            }
+          } else {
+            out.push({ item: label, category: step.category });
+          }
+        } else {
+          out.push({ item: label, category: step.category });
+        }
+      }
     }
     return out;
   }, [picks]);
@@ -232,7 +252,7 @@ function GlowBowlBuilder() {
         </div>
       </section>
 
-      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 lg:grid-cols-[1fr_280px]">
+      <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 lg:grid-cols-[1fr_320px]">
         <div className="space-y-4 min-w-0">
           <section className="rounded-2xl border border-border bg-card p-5">
             <h2 className="font-serif text-xl mb-1">Start from a preset</h2>
@@ -333,54 +353,57 @@ function GlowBowlBuilder() {
               </ul>
             )}
 
-            <div className="flex flex-col gap-2">
-              <Button onClick={addToShopping} disabled={totalPicked === 0} className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90">
+            {/* Action buttons — more breathing room, less squashed */}
+            <div className="flex flex-col gap-2.5 pt-1">
+              <Button onClick={addToShopping} disabled={totalPicked === 0} className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 h-11">
                 <ShoppingBasket className="h-4 w-4" />
-                {added ? "Added to your list!" : "Add bowl to shopping list"}
+                {added ? "Added to your list!" : "Add to shopping list"}
               </Button>
-              {added && <Link to="/shopping" className="text-center text-xs text-secondary underline underline-offset-2">View shopping list →</Link>}
+              {added && <Link to="/shopping" className="text-center text-xs text-secondary underline underline-offset-2 -mt-1">View shopping list →</Link>}
 
               <Button
                 variant="outline"
                 onClick={() => setShowPlanPicker(v => !v)}
                 disabled={totalPicked === 0}
-                className="w-full border-secondary/40 hover:border-secondary hover:text-secondary"
+                className="w-full border-secondary/40 hover:border-secondary hover:text-secondary h-11"
               >
                 <CalendarPlus className="h-4 w-4" />
                 {showPlanPicker ? "Cancel" : "Add to meal plan"}
               </Button>
               {plannedTo && (
-                <p className="text-center text-xs text-secondary">Added to {plannedTo} ✓</p>
+                <p className="text-center text-xs text-secondary -mt-1">Added to {plannedTo} ✓</p>
               )}
 
               {showPlanPicker && (
-                <div className="mt-2 rounded-xl border border-border p-3">
-                  <p className="mb-2 text-[11px] text-muted-foreground">Tap a slot:</p>
-                  <div className="grid grid-cols-[auto_repeat(4,1fr)] gap-1 text-[10px] overflow-x-auto">
-                    <div />
-                    {SLOTS.map(s => <div key={s} className="text-center capitalize text-muted-foreground">{s}</div>)}
-                    {DAYS.map(d => (
-                      <div key={d} className="contents">
-                        <div className="py-1 text-muted-foreground">{d}</div>
-                        {SLOTS.map(s => {
-                          const filled = !!plan[`${d}-${s}`];
-                          return (
-                            <button
-                              key={s}
-                              onClick={() => addToPlan(d, s)}
-                              className={`rounded-md border py-1 text-[10px] transition-colors ${filled ? "border-secondary bg-secondary/10 text-secondary" : "border-border text-muted-foreground hover:border-secondary hover:text-secondary"}`}
-                            >
-                              {filled ? "✓" : "+"}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    ))}
+                <div className="mt-1 rounded-xl border border-border p-4">
+                  <p className="mb-3 text-xs text-muted-foreground">Tap a slot to add this bowl:</p>
+                  <div className="overflow-x-auto">
+                    <div className="grid grid-cols-[36px_repeat(4,1fr)] gap-1.5 text-[11px] min-w-[280px]">
+                      <div />
+                      {SLOTS.map(s => <div key={s} className="text-center capitalize text-muted-foreground py-1">{s.slice(0,4)}</div>)}
+                      {DAYS.map(d => (
+                        <div key={d} className="contents">
+                          <div className="py-1.5 text-muted-foreground">{d}</div>
+                          {SLOTS.map(s => {
+                            const filled = !!plan[`${d}-${s}`];
+                            return (
+                              <button
+                                key={s}
+                                onClick={() => addToPlan(d, s)}
+                                className={`rounded-md border py-1.5 text-[11px] transition-colors ${filled ? "border-secondary bg-secondary/10 text-secondary" : "border-border text-muted-foreground hover:border-secondary hover:text-secondary"}`}
+                              >
+                                {filled ? "✓" : "+"}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
 
-              {totalPicked > 0 && <button onClick={reset} className="text-center text-xs text-muted-foreground hover:text-foreground">Start over</button>}
+              {totalPicked > 0 && <button onClick={reset} className="text-center text-xs text-muted-foreground hover:text-foreground pt-1">Start over</button>}
             </div>
           </div>
         </aside>
